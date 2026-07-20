@@ -99,10 +99,22 @@ function ConcertsPage() {
   const [activeFilter, setActiveFilter] = useState<
     "tous" | "a-venir" | "passes"
   >("tous");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"grille" | "liste">("grille");
+
   const filteredConcerts = concerts.filter((concert) => {
-    if (activeFilter === "a-venir") return concert.status === "prevu";
-    if (activeFilter === "passes") return concert.status === "passe";
-    return true;
+    const matchesStatusFilter =
+      activeFilter === "tous" ||
+      (activeFilter === "a-venir" && concert.status === "prevu") ||
+      (activeFilter === "passes" && concert.status === "passe");
+
+    const query = searchQuery.toLowerCase();
+    const matchesSearch =
+      concert.name.toLowerCase().includes(query) ||
+      concert.venue.toLowerCase().includes(query) ||
+      concert.city.toLowerCase().includes(query);
+
+    return matchesStatusFilter && matchesSearch;
   });
   return (
     <>
@@ -147,9 +159,34 @@ function ConcertsPage() {
             {concerts.filter((c) => c.status === "passe").length}
           </span>
         </button>
+        <div className="filter-sep"></div>
+
+        <div className="filter-search">
+          <input
+            placeholder="Chercher un groupe, un lieu…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="view-toggle">
+          <button
+            className={viewMode === "grille" ? "active" : ""}
+            title="Grille"
+            onClick={() => setViewMode("grille")}>
+            ⛶
+          </button>
+          <button
+            className={viewMode === "liste" ? "active" : ""}
+            title="Liste"
+            onClick={() => setViewMode("liste")}>
+            ☰
+          </button>
+        </div>
       </div>
 
-      <section className="concerts-grid">
+      <section
+        className={`concerts-grid ${viewMode === "liste" ? "view-liste" : ""}`}>
         {filteredConcerts.map((concert) => (
           <ConcertCard key={concert.id} concert={concert} />
         ))}
