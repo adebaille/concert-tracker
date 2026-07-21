@@ -1,0 +1,147 @@
+.gr-table {
+  width: 100%;
+  background: var(--bg-elev-1);
+  border: 0.5px solid var(--hair);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.gr-row {
+  display: grid;
+  grid-template-columns: 56px minmax(180px, 1.6fr) 110px 100px 130px 90px 130px;
+  align-items: center;
+  gap: var(--s-4);
+  padding: 14px 22px;
+  border-top: 0.5px solid var(--hair);
+  transition: background var(--t-fast) var(--ease);
+  position: relative;
+}
+.gr-row:first-child { border-top: none; }
+.gr-row:not(.head):hover { background: rgba(255,255,255,0.025); }
+.gr-row.head {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.015);
+  padding-top: 14px; padding-bottom: 14px;
+}
+.gr-row .col-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+.gr-row .col-name { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.gr-row .band-cover {
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  display: grid; place-items: center;
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.85);
+}
+.band-cover.kpop  { background: linear-gradient(135deg, #6b3cb8, #ff4fa3); }
+.band-cover.kpop2 { background: linear-gradient(135deg, #2dd4bf, #b06aff); }
+.band-cover.kpop3 { background: linear-gradient(135deg, #ff4fa3, #ffb347); }
+.band-cover.metal { background: linear-gradient(135deg, #2b1a14, #ff6b4a); }
+.band-cover.metal2 { background: linear-gradient(135deg, #1a1f2e, #b06aff); }
+.band-cover.metal3 { background: linear-gradient(135deg, #181818, #4a4a52); }
+.band-name-cell .name { font-size: 14px; font-weight: 600; }
+.band-name-cell .country {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+.col-style { font-size: 12px; color: var(--text-muted); }
+
+.love {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 14px;
+  letter-spacing: -2px;
+}
+
+.seen-yes, .seen-no {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.seen-yes { color: var(--green); }
+.seen-no { color: var(--text-dim); }
+.seen-yes::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+.seen-no::before  { content: ""; width: 7px; height: 7px; border-radius: 50%; border: 0.5px solid var(--text-dim); }
+
+.col-added {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px;
+}
+.col-added .avatar { width: 22px; height: 22px; font-size: 9px; border-width: 1px; }
+.col-added .date { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.06em; }
+
+.gr-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-4);
+  margin-bottom: var(--s-8);
+}
+.gr-stat {
+  background: var(--bg-elev-1);
+  border: 0.5px solid var(--hair);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.gr-stat::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(160px 80px at 100% 0%, var(--glow, transparent), transparent 70%);
+  pointer-events: none;
+}
+.gr-stat .num {
+  font-family: var(--font-display);
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+}
+.gr-stat .lbl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.gr-stat .sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text);
+  margin-top: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.gr-stat.s1 { --glow: rgba(176,106,255,0.18); }
+.gr-stat.s2 { --glow: rgba(255,107,74,0.18); }
+.gr-stat.s3 { --glow: rgba(45,212,191,0.18); }
+.gr-stat.s4 { --glow: rgba(255,79,163,0.18); }
+.gr-stat .ratio-bar {
+  height: 4px; border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+  margin-top: 12px;
+  position: relative;
+}
+.gr-stat .ratio-bar > span {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: var(--grad-primary);
+  border-radius: 999px;
+}

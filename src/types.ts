@@ -13,3 +13,18 @@ export type Concert = {
   setlist?: string
   anecdote?: string
 }
+
+export type Groupe = {
+  id: number
+  name: string
+  label: string
+  genre: 'kpop' | 'metal'
+  country: string
+  coverInitials: string
+  loveLevel: number
+  seen: boolean
+  seenLabel: string
+  addedByName: string
+  addedByGenre: 'kpop' | 'metal'
+  addedDate: string
+}
