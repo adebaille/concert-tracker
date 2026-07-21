@@ -40,3 +40,16 @@ export type Reve = {
   note: string
   avatarGenres: ('kpop' | 'metal')[]
 }
+
+export type MerchItem = {
+  id: number
+  previewStyle: 'tee' | 'hoodie' | 'poster' | 'cd' | 'photocard' | 'lightstick' | 'vinyl' | 'cap'
+  category: 'tshirt' | 'hoodie' | 'poster' | 'cd-album' | 'photocard' | 'lightstick' | 'casquette'
+  bgText: string
+  details: string
+  name: string
+  band: string
+  bandNote: string
+  price: number
+  owner: 'alison' | 'emeline'
+}
