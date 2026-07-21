@@ -28,3 +28,15 @@ export type Groupe = {
   addedByGenre: 'kpop' | 'metal'
   addedDate: string
 }
+
+export type Reve = {
+  id: number
+  priority: 'ultime' | 'haute' | 'moyenne'
+  genre: 'kpop' | 'metal'
+  title: string
+  subtitle: string
+  dateValue: string
+  budget: number
+  note: string
+  avatarGenres: ('kpop' | 'metal')[]
+}
