@@ -1,3 +1,14 @@
+export type Profil = {
+  id: string
+  display_name: string
+  avatar_style: 'kpop' | 'metal'
+}
+
+export type Participant = {
+  name: string
+  avatarStyle: 'kpop' | 'metal'
+}
+
 export type Concert = {
   id: number
   genre: 'kpop' | 'metal' | 'fest'
@@ -10,6 +21,7 @@ export type Concert = {
   venue: string
   city: string
   rating: number
+  participants: Participant[]
   setlist?: string
   anecdote?: string
 }
@@ -38,7 +50,7 @@ export type Reve = {
   dateValue: string
   budget: number
   note: string
-  avatarGenres: ('kpop' | 'metal')[]
+  participants: Participant[]
 }
 
 export type MerchItem = {
@@ -51,5 +63,7 @@ export type MerchItem = {
   band: string
   bandNote: string
   price: number
-  owner: 'alison' | 'emeline'
+  ownerId: string
+  isShared: boolean
+  participants: Participant[]
 }
