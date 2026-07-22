@@ -1,23 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabaseClient'
+import { resolveParticipants } from '../lib/participants'
 import '../styles/wishlist.css'
 import Topbar from '../components/TopBar'
 import DreamCard from '../components/DreamCard'
-import type { Reve } from '../types'
-
-const reves: Reve[] = [
-  { id: 1, priority: 'ultime', genre: 'kpop', title: 'BTS · World Tour Reunion', subtitle: "Si jamais ils reviennent. Si jamais Paris.", dateValue: '2026 → 2027', budget: 350, note: "Alison · rêve d'enfance", avatarGenres: ['kpop'] },
-  { id: 2, priority: 'ultime', genre: 'metal', title: 'Tool · à Paris', subtitle: 'Une tournée européenne par décennie. Cette fois.', dateValue: 'printemps 2027 ?', budget: 180, note: 'Emeline · obsession 2018', avatarGenres: ['metal'] },
-  { id: 3, priority: 'ultime', genre: 'kpop', title: 'aespa · Synk Hyper Line', subtitle: 'Tokyo Dome, voyage compris.', dateValue: 'automne 2026', budget: 1200, note: 'À deux · voyage', avatarGenres: ['kpop', 'metal'] },
-  { id: 4, priority: 'ultime', genre: 'metal', title: 'Knotfest Japan', subtitle: 'Festival annuel, line-up dingue chaque année.', dateValue: 'avril 2027', budget: 1800, note: 'Emeline · pour rêver', avatarGenres: ['metal', 'kpop'] },
-  { id: 5, priority: 'haute', genre: 'kpop', title: 'ATEEZ · World Tour', subtitle: 'Accor Arena, deux soirs. Faut juste être rapides.', dateValue: '15 nov. 2026', budget: 110, note: 'Alison', avatarGenres: ['kpop'] },
-  { id: 6, priority: 'haute', genre: 'metal', title: 'Architects · The Sky', subtitle: 'Olympia, tournée du nouvel album.', dateValue: '04 oct. 2026', budget: 55, note: 'À deux', avatarGenres: ['metal', 'kpop'] },
-  { id: 7, priority: 'haute', genre: 'kpop', title: 'IVE · World Tour Show', subtitle: 'Première tournée européenne — Adidas Arena.', dateValue: '22 jan. 2027', budget: 95, note: 'Alison', avatarGenres: ['kpop'] },
-  { id: 8, priority: 'haute', genre: 'metal', title: 'Knocked Loose · Pop', subtitle: "L'Élysée Montmartre · ils repassent enfin.", dateValue: '18 fév. 2027', budget: 45, note: 'Emeline', avatarGenres: ['metal'] },
-  { id: 9, priority: 'haute', genre: 'kpop', title: 'Babymonster · See You There', subtitle: 'Première tournée — Zénith Paris.', dateValue: '12 déc. 2026', budget: 80, note: 'Alison', avatarGenres: ['kpop'] },
-  { id: 10, priority: 'moyenne', genre: 'metal', title: 'Motionless In White', subtitle: 'Bataclan · si le calendrier suit.', dateValue: 'mars 2027', budget: 60, note: 'Emeline', avatarGenres: ['metal'] },
-  { id: 11, priority: 'moyenne', genre: 'kpop', title: 'ITZY · Born to Be', subtitle: "Si une date à Paris s'ajoute.", dateValue: 'automne 2026', budget: 75, note: 'Alison', avatarGenres: ['kpop'] },
-  { id: 12, priority: 'moyenne', genre: 'metal', title: 'Download Festival', subtitle: "UK · pour l'expérience complète, un jour.", dateValue: 'juin 2027', budget: 350, note: 'À deux · voyage', avatarGenres: ['metal', 'kpop'] },
-]
+import type { Reve, Profil } from '../types'
 
 const COLUMNS = [
   { priority: 'ultime' as const, icon: '🌙', label: 'Rêve ultime', unit: 'rêves' },
@@ -26,8 +13,38 @@ const COLUMNS = [
 ]
 
 function WishlistPage() {
+  const [reves, setReves] = useState<Reve[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState<'toutes' | 'ultime' | 'haute' | 'moyenne'>('toutes')
   const [searchQuery, setSearchQuery] = useState('')
+
+  useEffect(() => {
+    async function loadReves() {
+      const [{ data: reveRows }, { data: profilRows }] = await Promise.all([
+        supabase.from('reves').select('*'),
+        supabase.from('profils').select('*'),
+      ])
+
+      const profils = (profilRows ?? []) as Profil[]
+
+      const formatted: Reve[] = (reveRows ?? []).map((row) => ({
+        id: row.id,
+        priority: row.priority,
+        genre: row.genre,
+        title: row.title,
+        subtitle: row.subtitle ?? '',
+        dateValue: row.date_value ?? '',
+        budget: row.budget ?? 0,
+        note: row.note ?? '',
+        participants: resolveParticipants(profils, row.added_by, row.is_shared),
+      }))
+
+      setReves(formatted)
+      setIsLoading(false)
+    }
+
+    loadReves()
+  }, [])
 
   const searchedReves = reves.filter((r) =>
     r.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -42,12 +59,21 @@ function WishlistPage() {
     (col) => activeFilter === 'toutes' || activeFilter === col.priority
   )
 
+  if (isLoading) {
+    return (
+      <>
+        <Topbar currentPage="Wishlist" />
+        <p style={{ padding: 24 }}>Chargement de la wishlist...</p>
+      </>
+    )
+  }
+
   return (
     <>
       <Topbar currentPage="Wishlist" />
 
       <div className="page-head">
-        <h1 className="page-title"><span className="accent">Wishlist</span></h1>
+        <h1 className="page-title"><span className="accent">Wishlist</span> · les rêves</h1>
         <div className="page-sub">
           <span>{reves.length} concerts rêvés</span><span className="dot"></span>
           <span>{ultimeCount} rêves ultimes</span><span className="dot"></span>

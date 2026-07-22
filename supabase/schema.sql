@@ -169,3 +169,7 @@ create policy "merch_authenticated_access"
   to authenticated
   using (true)
   with check (true);
+
+  alter table concerts add column is_shared boolean not null default false;
+alter table reves add column is_shared boolean not null default false;
+alter table merch add column is_shared boolean not null default false;

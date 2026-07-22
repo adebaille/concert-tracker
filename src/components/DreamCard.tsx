@@ -1,4 +1,5 @@
 import type { Reve } from '../types'
+import { participantsLabel } from '../lib/participants'
 
 type DreamCardProps = {
   reve: Reve
@@ -7,6 +8,10 @@ type DreamCardProps = {
 function DreamCard({ reve }: DreamCardProps) {
   const dateLabel = reve.priority === 'ultime' ? 'Date estimée' : 'Date possible'
   const budgetLabel = reve.priority === 'ultime' ? 'Budget rêvé' : 'Budget'
+
+  const footLabel = reve.note
+    ? `${participantsLabel(reve.participants)} · ${reve.note}`
+    : participantsLabel(reve.participants)
 
   return (
     <article className={`wl-card ${reve.priority}`}>
@@ -34,11 +39,11 @@ function DreamCard({ reve }: DreamCardProps) {
       <div className="wl-card-foot">
         <div className="by">
           <div className="avatars">
-            {reve.avatarGenres.map((genre, i) => (
-              <div key={i} className={`avatar ${genre}`}>{genre === 'kpop' ? 'A' : 'E'}</div>
+            {reve.participants.map((p) => (
+              <div key={p.name} className={`avatar ${p.avatarStyle}`}>{p.name[0]}</div>
             ))}
           </div>
-          <span className="label-mono">{reve.note}</span>
+          <span className="label-mono">{footLabel}</span>
         </div>
       </div>
     </article>

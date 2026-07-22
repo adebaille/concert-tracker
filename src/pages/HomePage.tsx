@@ -1,53 +1,127 @@
-import "../styles/home.css";
-import Topbar from "../components/TopBar";
-import { concerts } from "../data/concerts";
-import { groupes } from "../data/groupes";
-import { merchItems } from "../data/merch";
-import Countdown from "../components/Countdown";
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabaseClient'
+import { formatConcertDate, formatDayMonth } from '../lib/formatDate'
+import { resolveParticipants, participantsLabel } from '../lib/participants'
+import '../styles/home.css'
+import Topbar from '../components/TopBar'
+import Countdown from '../components/Countdown'
+import type { Participant, Profil } from '../types'
+
+type ConcertRow = {
+  id: number
+  name: string
+  genre: 'kpop' | 'metal' | 'fest'
+  status: 'prevu' | 'passe' | 'annule'
+  event_date: string
+  venue: string
+  city: string
+  price: number | null
+  added_by: string
+  is_shared: boolean
+}
 
 type ActivityEntry = {
-  id: number;
-  authorName: string;
-  authorGenre: "kpop" | "metal";
-  text: string;
-  time: string;
-};
-
-const activityLog: ActivityEntry[] = [
-  {
-    id: 1,
-    authorName: "Emeline",
-    authorGenre: "metal",
-    text: "a ajouté Sleep Token à la wishlist.",
-    time: "IL Y A 2 H",
-  },
-  {
-    id: 2,
-    authorName: "Alison",
-    authorGenre: "kpop",
-    text: "a ajouté aespa aux groupes suivis.",
-    time: "HIER · 23H44",
-  },
-  {
-    id: 3,
-    authorName: "Emeline",
-    authorGenre: "metal",
-    text: "a ajouté le hoodie Bring Me The Horizon à l'inventaire.",
-    time: "18 MAI · 18H03",
-  },
-  {
-    id: 4,
-    authorName: "Alison",
-    authorGenre: "kpop",
-    text: "a noté Stray Kids · dominATE World Tour ★★★★★.",
-    time: "16 MAI · 09H12",
-  },
-];
+  key: string
+  createdAt: string
+  authorName: string
+  authorAvatarStyle: 'kpop' | 'metal'
+  text: string
+}
 
 function HomePage() {
-  const nextConcert = concerts.find((c) => c.status === "prevu");
-  const upcomingConcerts = concerts.filter((c) => c.status === "prevu");
-  const pastConcertsCount = concerts.filter((c) => c.status === "passe").length;
+  const [concerts, setConcerts] = useState<ConcertRow[]>([])
+  const [profils, setProfils] = useState<Profil[]>([])
+  const [groupesCount, setGroupesCount] = useState(0)
+  const [merchCount, setMerchCount] = useState(0)
+  const [activity, setActivity] = useState<ActivityEntry[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadHome() {
+      const [
+        { data: concertRows },
+        { data: groupeRows },
+        { data: reveRows },
+        { data: merchRows },
+        { data: profilRows },
+      ] = await Promise.all([
+        supabase.from('concerts').select('*'),
+        supabase.from('groupes').select('id, name, created_at, added_by'),
+        supabase.from('reves').select('id, title, created_at, added_by'),
+        supabase.from('merch').select('id, name, created_at, owner_id'),
+        supabase.from('profils').select('*'),
+      ])
+
+      const profilsData = (profilRows ?? []) as Profil[]
+      const concertsData = (concertRows ?? []) as ConcertRow[]
+
+      function authorOf(userId: string) {
+        const profil = profilsData.find((p) => p.id === userId)
+        return {
+          authorName: profil?.display_name ?? '?',
+          authorAvatarStyle: profil?.avatar_style ?? ('kpop' as const),
+        }
+      }
+
+      const entries: ActivityEntry[] = [
+        ...(groupeRows ?? []).map((r) => ({
+          key: `groupe-${r.id}`,
+          createdAt: r.created_at,
+          text: `a ajouté ${r.name} aux groupes suivis.`,
+          ...authorOf(r.added_by),
+        })),
+        ...concertsData.map((r) => ({
+          key: `concert-${r.id}`,
+          createdAt: (r as ConcertRow & { created_at: string }).created_at,
+          text: `a ajouté ${r.name} aux concerts.`,
+          ...authorOf(r.added_by),
+        })),
+        ...(reveRows ?? []).map((r) => ({
+          key: `reve-${r.id}`,
+          createdAt: r.created_at,
+          text: `a ajouté ${r.title} à la wishlist.`,
+          ...authorOf(r.added_by),
+        })),
+        ...(merchRows ?? []).map((r) => ({
+          key: `merch-${r.id}`,
+          createdAt: r.created_at,
+          text: `a ajouté ${r.name} à l'inventaire merch.`,
+          ...authorOf(r.owner_id),
+        })),
+      ]
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, 4)
+
+      setConcerts(concertsData)
+      setProfils(profilsData)
+      setGroupesCount((groupeRows ?? []).length)
+      setMerchCount((merchRows ?? []).length)
+      setActivity(entries)
+      setIsLoading(false)
+    }
+
+    loadHome()
+  }, [])
+
+  const upcomingConcerts = concerts
+    .filter((c) => c.status === 'prevu')
+    .sort((a, b) => a.event_date.localeCompare(b.event_date))
+
+  const nextConcert = upcomingConcerts[0]
+  const pastConcertsCount = concerts.filter((c) => c.status === 'passe').length
+
+  const nextParticipants: Participant[] = nextConcert
+    ? resolveParticipants(profils, nextConcert.added_by, nextConcert.is_shared)
+    : []
+
+  if (isLoading) {
+    return (
+      <>
+        <Topbar currentPage="Accueil" />
+        <p style={{ padding: 24 }}>Chargement...</p>
+      </>
+    )
+  }
 
   return (
     <>
@@ -56,9 +130,8 @@ function HomePage() {
       <section className="hero">
         <div>
           <h1 className="hero-title">
-            <span className="gradient">CONCERTS</span>
-            <br />
-            <span className="outlined">TRACKER</span>
+            NOTRE <span className="gradient">UNIVERS</span><br />
+            <span className="outlined">MUSICAL</span>
           </h1>
           <div className="hero-meta">
             <span className="tag metal">🤘 Métal</span>
@@ -68,9 +141,7 @@ function HomePage() {
           </div>
         </div>
         <div className="hero-right">
-          <span>
-            {concerts.length} concerts · {groupes.length} groupes
-          </span>
+          <span>{concerts.length} concerts · {groupesCount} groupes</span>
         </div>
       </section>
 
@@ -85,31 +156,17 @@ function HomePage() {
               <div className="placeholder-tag">Photo · à uploader</div>
               <div className="band-block">
                 <div className="band-genre">
-                  {nextConcert.genre === "kpop" ? "K-Pop" : "Métal"} ·{" "}
-                  {nextConcert.city}
+                  {nextConcert.genre === 'kpop' ? 'K-Pop' : 'Métal'} · {nextConcert.city}
                 </div>
-                <div className="band-name">
-                  {nextConcert.name.toUpperCase()}
-                </div>
+                <div className="band-name">{nextConcert.name.toUpperCase()}</div>
               </div>
             </div>
             <div className="nc-info">
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div className="nc-label">Date · lieu</div>
-                  <div className="nc-value big">{nextConcert.date}</div>
-                  <div
-                    className="nc-value"
-                    style={{
-                      marginTop: 6,
-                      color: "var(--text-muted)",
-                      fontWeight: 400,
-                    }}>
+                  <div className="nc-value big">{formatConcertDate(nextConcert.event_date)}</div>
+                  <div className="nc-value" style={{ marginTop: 6, color: 'var(--text-muted)', fontWeight: 400 }}>
                     {nextConcert.venue} · {nextConcert.city}
                   </div>
                 </div>
@@ -118,46 +175,32 @@ function HomePage() {
 
               <div>
                 <div className="nc-label">Compte à rebours</div>
-                <Countdown targetDate={new Date('2026-09-14T19:30:00')} />
+                <Countdown targetDate={new Date(nextConcert.event_date)} />
               </div>
 
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 24,
-                }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
                 <div>
                   <div className="nc-label">Place</div>
-                  <div
-                    className="nc-value"
-                    style={{ fontFamily: "var(--font-mono)", fontSize: 14 }}>
-                    {nextConcert.price} €
+                  <div className="nc-value" style={{ fontFamily: 'var(--font-mono)', fontSize: 14 }}>
+                    {nextConcert.price ?? 0} €
                   </div>
                 </div>
                 <div>
                   <div className="nc-label">Compagnie</div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      marginTop: 2,
-                    }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
                     <div className="avatars">
-                      <div className="avatar metal">E</div>
-                      <div className="avatar kpop">A</div>
+                      {nextParticipants.map((p) => (
+                        <div key={p.name} className={`avatar ${p.avatarStyle}`}>{p.name[0]}</div>
+                      ))}
                     </div>
-                    <span style={{ fontSize: 13 }}>À deux</span>
+                    <span style={{ fontSize: 13 }}>{participantsLabel(nextParticipants)}</span>
                   </div>
                 </div>
               </div>
 
               <div className="nc-actions">
                 <button className="btn-ghost">Voir le détail</button>
-                <button className="btn-ghost primary">
-                  Ajouter au calendrier
-                </button>
+                <button className="btn-ghost primary">Ajouter au calendrier</button>
               </div>
             </div>
           </section>
@@ -166,71 +209,24 @@ function HomePage() {
 
       <section className="stats">
         <div className="stat s-1">
-          <div className="stat-head">
-            <div className="stat-ico">🎸</div>
-          </div>
-          <div className="stat-num">{groupes.length}</div>
+          <div className="stat-head"><div className="stat-ico">🎸</div></div>
+          <div className="stat-num">{groupesCount}</div>
           <div className="stat-label">Groupes suivis</div>
-          <div className="stat-bars">
-            <span style={{ height: "30%" }}></span>
-            <span style={{ height: "50%" }}></span>
-            <span style={{ height: "45%" }}></span>
-            <span style={{ height: "70%" }}></span>
-            <span style={{ height: "60%" }}></span>
-            <span style={{ height: "85%" }}></span>
-            <span style={{ height: "100%" }}></span>
-          </div>
         </div>
         <div className="stat s-2">
-          <div className="stat-head">
-            <div className="stat-ico">🎫</div>
-          </div>
+          <div className="stat-head"><div className="stat-ico">🎫</div></div>
           <div className="stat-num">{pastConcertsCount}</div>
           <div className="stat-label">Concerts vécus</div>
-          <div className="stat-bars">
-            <span style={{ height: "40%" }}></span>
-            <span style={{ height: "60%" }}></span>
-            <span style={{ height: "55%" }}></span>
-            <span style={{ height: "90%" }}></span>
-            <span style={{ height: "75%" }}></span>
-            <span style={{ height: "80%" }}></span>
-            <span style={{ height: "100%" }}></span>
-          </div>
         </div>
         <div className="stat s-3">
-          <div className="stat-head">
-            <div className="stat-ico">📍</div>
-          </div>
+          <div className="stat-head"><div className="stat-ico">📍</div></div>
           <div className="stat-num">{upcomingConcerts.length}</div>
           <div className="stat-label">À venir</div>
-          <div className="stat-bars">
-            <span style={{ height: "20%" }}></span>
-            <span style={{ height: "30%" }}></span>
-            <span style={{ height: "60%" }}></span>
-            <span style={{ height: "45%" }}></span>
-            <span style={{ height: "70%" }}></span>
-            <span style={{ height: "55%" }}></span>
-            <span style={{ height: "90%" }}></span>
-          </div>
         </div>
         <div className="stat s-4">
-          <div className="stat-head">
-            <div className="stat-ico">👕</div>
-          </div>
-          <div className="stat-num">
-            {merchItems.length}
-            <span className="suffix">items</span>
-          </div>
+          <div className="stat-head"><div className="stat-ico">👕</div></div>
+          <div className="stat-num">{merchCount}<span className="suffix">items</span></div>
           <div className="stat-label">Inventaire merch</div>
-          <div className="stat-bars">
-            <span style={{ height: "50%" }}></span>
-            <span style={{ height: "65%" }}></span>
-            <span style={{ height: "70%" }}></span>
-            <span style={{ height: "60%" }}></span>
-            <span style={{ height: "80%" }}></span>
-            <span style={{ height: "75%" }}></span>
-            <span style={{ height: "100%" }}></span>
-          </div>
         </div>
       </section>
 
@@ -238,13 +234,11 @@ function HomePage() {
         <div className="panel">
           <div className="panel-head">
             <div className="panel-title">À VENIR</div>
-            <div className="panel-sub">
-              {upcomingConcerts.length} concert(s) prévu(s)
-            </div>
+            <div className="panel-sub">{upcomingConcerts.length} concert(s) prévu(s)</div>
           </div>
           <div className="timeline">
             {upcomingConcerts.map((concert) => {
-              const [day, month] = concert.date.split(" ");
+              const { day, month } = formatDayMonth(concert.event_date)
               return (
                 <div key={concert.id} className="tl-item">
                   <div className="tl-date">
@@ -253,16 +247,14 @@ function HomePage() {
                   </div>
                   <div>
                     <div className="tl-name">
-                      <span className={`dot ${concert.genre}`}></span>
-                      {concert.name}
+                      <span className={`dot ${concert.genre}`}></span>{concert.name}
                     </div>
                     <div className="tl-where">
-                      {concert.venue} <span className="sep">·</span>{" "}
-                      {concert.city}
+                      {concert.venue} <span className="sep">·</span> {concert.city}
                     </div>
                   </div>
                 </div>
-              );
+              )
             })}
           </div>
         </div>
@@ -273,16 +265,12 @@ function HomePage() {
             <div className="panel-sub">Activité récente</div>
           </div>
           <div className="activity">
-            {activityLog.map((entry) => (
-              <div key={entry.id} className="act">
-                <div className={`act-avatar ${entry.authorGenre}`}>
-                  {entry.authorName[0]}
-                </div>
+            {activity.map((entry) => (
+              <div key={entry.key} className="act">
+                <div className={`act-avatar ${entry.authorAvatarStyle}`}>{entry.authorName[0]}</div>
                 <div>
-                  <div className="act-text">
-                    <strong>{entry.authorName}</strong> {entry.text}
-                  </div>
-                  <div className="act-time">{entry.time}</div>
+                  <div className="act-text"><strong>{entry.authorName}</strong> {entry.text}</div>
+                  <div className="act-time">{formatConcertDate(entry.createdAt)}</div>
                 </div>
               </div>
             ))}
@@ -290,7 +278,7 @@ function HomePage() {
         </div>
       </section>
     </>
-  );
+  )
 }
 
-export default HomePage;
+export default HomePage

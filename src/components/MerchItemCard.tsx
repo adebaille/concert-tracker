@@ -1,4 +1,5 @@
 import type { MerchItem as MerchItemData } from '../types'
+import { participantsLabel } from '../lib/participants'
 
 type MerchItemCardProps = {
   item: MerchItemData
@@ -9,14 +10,7 @@ const PREVIEW_EMOJI = {
   photocard: '📸', lightstick: '🪄', vinyl: '💿', cap: '🧢',
 }
 
-const OWNER_INFO = {
-  alison: { name: 'Alison', avatarClass: 'kpop' },
-  emeline: { name: 'Emeline', avatarClass: 'metal' },
-}
-
 function MerchItemCard({ item }: MerchItemCardProps) {
-  const owner = OWNER_INFO[item.owner]
-
   return (
     <article className="mr-item">
       <div className={`preview ${item.previewStyle}`}>
@@ -30,8 +24,12 @@ function MerchItemCard({ item }: MerchItemCardProps) {
         <div className="foot">
           <div className="price">{item.price} €</div>
           <div className="owner">
-            <div className={`avatar ${owner.avatarClass}`}>{owner.name[0]}</div>
-            {owner.name}
+            <div className="avatars">
+              {item.participants.map((p) => (
+                <div key={p.name} className={`avatar ${p.avatarStyle}`}>{p.name[0]}</div>
+              ))}
+            </div>
+            {participantsLabel(item.participants)}
           </div>
         </div>
       </div>

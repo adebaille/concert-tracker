@@ -1,4 +1,5 @@
 import type { Concert } from '../types'
+import { participantsLabel } from '../lib/participants'
 
 type ConcertCardProps = {
   concert: Concert
@@ -42,12 +43,12 @@ function ConcertCard({ concert }: ConcertCardProps) {
         <div className="cc-foot">
           <div className="cc-foot-left">
             <div className="avatars">
-              <div className="avatar kpop">L</div>
-              <div className="avatar metal">M</div>
+              {concert.participants.map((p) => (
+                <div key={p.name} className={`avatar ${p.avatarStyle}`}>{p.name[0]}</div>
+              ))}
             </div>
-            <span className="label-mono">À deux</span>
+            <span className="label-mono">{participantsLabel(concert.participants)}</span>
           </div>
-          {/* Étoiles encore en dur — on les branche au prochain pas */}
           <div className="stars">
             {[1, 2, 3, 4, 5].map((n) => (
               <span key={n} className={n <= concert.rating ? 'on' : ''}>★</span>
