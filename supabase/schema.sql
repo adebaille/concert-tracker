@@ -134,3 +134,38 @@ create index idx_merch_groupe_id on merch (groupe_id);
 create trigger trg_merch_updated_at
   before update on merch
   for each row execute function set_updated_at();
+
+  create policy "groupes_authenticated_access"
+  on groupes
+  for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "concerts_authenticated_access"
+  on concerts
+  for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "concert_groupes_authenticated_access"
+  on concert_groupes
+  for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "reves_authenticated_access"
+  on reves
+  for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "merch_authenticated_access"
+  on merch
+  for all
+  to authenticated
+  using (true)
+  with check (true);
