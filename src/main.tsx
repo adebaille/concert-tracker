@@ -8,6 +8,7 @@ import ConcertsPage from './pages/ConcertsPage.tsx'
 import GroupesPage from './pages/GroupesPage.tsx'
 import WishlistPage from './pages/WishlistPage.tsx'
 import MerchPage from './pages/MerchPage.tsx'
+import ParametresPage from './pages/ParametresPage.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="groupes" element={<GroupesPage />} />
           <Route path="wishlist" element={<WishlistPage />} />
           <Route path="merch" element={<MerchPage />} />
+          <Route path="parametres" element={<ParametresPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
