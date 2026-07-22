@@ -1,12 +1,49 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabaseClient'
 import '../styles/groupes.css'
 import Topbar from '../components/TopBar'
 import GroupRow from '../components/GroupRow'
-import { groupes } from '../data/groupes'
+import type { Groupe } from '../types'
 
 function GroupesPage() {
+  const [groupes, setGroupes] = useState<Groupe[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState<'tous' | 'metal' | 'kpop'>('tous')
   const [searchQuery, setSearchQuery] = useState('')
+
+  useEffect(() => {
+    async function loadGroupes() {
+      const [{ data: groupeRows }, { data: profilRows }] = await Promise.all([
+        supabase.from('groupes').select('*'),
+        supabase.from('profils').select('*'),
+      ])
+
+      const profils = profilRows ?? []
+
+      const formatted: Groupe[] = (groupeRows ?? []).map((row) => {
+        const profil = profils.find((p) => p.id === row.added_by)
+        return {
+          id: row.id,
+          name: row.name,
+          label: row.label ?? '',
+          genre: row.genre,
+          country: row.country,
+          coverInitials: row.cover_initials,
+          loveLevel: row.love_level,
+          seen: row.is_seen,
+          seenLabel: row.seen_label ?? '',
+          addedByName: profil?.display_name ?? '?',
+          addedByGenre: profil?.avatar_style ?? 'kpop',
+          addedDate: new Date(row.created_at).toLocaleDateString('fr-FR'),
+        }
+      })
+
+      setGroupes(formatted)
+      setIsLoading(false)
+    }
+
+    loadGroupes()
+  }, [])
 
   const filteredGroupes = groupes.filter((g) => {
     const matchesGenre = activeFilter === 'tous' || g.genre === activeFilter
@@ -17,8 +54,17 @@ function GroupesPage() {
   const metalCount = groupes.filter((g) => g.genre === 'metal').length
   const kpopCount = groupes.filter((g) => g.genre === 'kpop').length
   const seenCount = groupes.filter((g) => g.seen).length
-  const seenPercent = Math.round((seenCount / groupes.length) * 100)
+  const seenPercent = groupes.length > 0 ? Math.round((seenCount / groupes.length) * 100) : 0
   const countriesCount = new Set(groupes.map((g) => g.country)).size
+
+  if (isLoading) {
+    return (
+      <>
+        <Topbar currentPage="Groupes" />
+        <p style={{ padding: 24 }}>Chargement des groupes...</p>
+      </>
+    )
+  }
 
   return (
     <>
@@ -45,7 +91,7 @@ function GroupesPage() {
           </div>
           <div className="lbl">Métal · Kpop</div>
           <div className="ratio-bar">
-            <span style={{ width: `${(metalCount / groupes.length) * 100}%`, background: 'var(--grad-metal)' }}></span>
+            <span style={{ width: `${groupes.length > 0 ? (metalCount / groupes.length) * 100 : 0}%`, background: 'var(--grad-metal)' }}></span>
           </div>
         </div>
         <div className="gr-stat s3">
