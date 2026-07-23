@@ -3,6 +3,8 @@ import { participantsLabel } from '../lib/participants'
 
 type ConcertCardProps = {
   concert: Concert
+  onEdit: (concert: Concert) => void
+  onDelete: (concert: Concert) => void
 }
 
 const STATUS_LABELS = {
@@ -11,9 +13,13 @@ const STATUS_LABELS = {
   annule: 'Annulé',
 }
 
-function ConcertCard({ concert }: ConcertCardProps) {
+function ConcertCard({ concert, onEdit, onDelete }: ConcertCardProps) {
   return (
     <article className="concert-card">
+      <div className="card-actions">
+        <button title="Modifier" onClick={() => onEdit(concert)}>✎</button>
+        <button title="Supprimer" onClick={() => onDelete(concert)}>✕</button>
+      </div>
       <div className={`cc-poster ${concert.genre}`}>
         <div className="placeholder-line">{concert.photoLabel}</div>
         <div className="big-bg">{concert.bigBg}</div>

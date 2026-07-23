@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { resolveParticipants } from '../lib/participants'
 import '../styles/wishlist.css'
+import '../styles/form.css'
 import Topbar from '../components/TopBar'
 import DreamCard from '../components/DreamCard'
+import ReveForm from '../components/ReveForm'
 import type { Reve, Profil } from '../types'
 
 const COLUMNS = [
@@ -15,36 +17,72 @@ const COLUMNS = [
 function WishlistPage() {
   const [reves, setReves] = useState<Reve[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingReve, setEditingReve] = useState<Reve | null>(null)
   const [activeFilter, setActiveFilter] = useState<'toutes' | 'ultime' | 'haute' | 'moyenne'>('toutes')
   const [searchQuery, setSearchQuery] = useState('')
 
+  async function loadReves() {
+    const [{ data: reveRows }, { data: profilRows }] = await Promise.all([
+      supabase.from('reves').select('*'),
+      supabase.from('profils').select('*'),
+    ])
+
+    const profils = (profilRows ?? []) as Profil[]
+
+    const formatted: Reve[] = (reveRows ?? []).map((row) => ({
+      id: row.id,
+      priority: row.priority,
+      genre: row.genre,
+      title: row.title,
+      subtitle: row.subtitle ?? '',
+      dateValue: row.date_value ?? '',
+      budget: row.budget ?? 0,
+      note: row.note ?? '',
+      isWatched: row.is_watched,
+      isShared: row.is_shared,
+      participants: resolveParticipants(profils, row.added_by, row.is_shared),
+    }))
+
+    setReves(formatted)
+    setIsLoading(false)
+  }
+
   useEffect(() => {
-    async function loadReves() {
-      const [{ data: reveRows }, { data: profilRows }] = await Promise.all([
-        supabase.from('reves').select('*'),
-        supabase.from('profils').select('*'),
-      ])
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- setState après await, donc pas synchrone
+    loadReves()
+  }, [])
 
-      const profils = (profilRows ?? []) as Profil[]
+  function openCreateForm() {
+    setEditingReve(null)
+    setIsFormOpen(true)
+  }
 
-      const formatted: Reve[] = (reveRows ?? []).map((row) => ({
-        id: row.id,
-        priority: row.priority,
-        genre: row.genre,
-        title: row.title,
-        subtitle: row.subtitle ?? '',
-        dateValue: row.date_value ?? '',
-        budget: row.budget ?? 0,
-        note: row.note ?? '',
-        participants: resolveParticipants(profils, row.added_by, row.is_shared),
-      }))
+  function openEditForm(reve: Reve) {
+    setEditingReve(reve)
+    setIsFormOpen(true)
+  }
 
-      setReves(formatted)
-      setIsLoading(false)
+  function closeForm() {
+    setIsFormOpen(false)
+    setEditingReve(null)
+  }
+
+  async function handleDelete(reve: Reve) {
+    const confirmed = window.confirm(
+      `Supprimer « ${reve.title} » ? Cette action est définitive.`
+    )
+    if (!confirmed) return
+
+    const { error } = await supabase.from('reves').delete().eq('id', reve.id)
+
+    if (error) {
+      window.alert('Suppression impossible : ' + error.message)
+      return
     }
 
     loadReves()
-  }, [])
+  }
 
   const searchedReves = reves.filter((r) =>
     r.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -70,7 +108,7 @@ function WishlistPage() {
 
   return (
     <>
-      <Topbar currentPage="Wishlist" />
+      <Topbar currentPage="Wishlist" onAdd={openCreateForm} />
 
       <div className="page-head">
         <h1 className="page-title"><span className="accent">Wishlist</span> · les rêves</h1>
@@ -151,12 +189,25 @@ function WishlistPage() {
                 </div>
               </div>
               {columnReves.map((reve) => (
-                <DreamCard key={reve.id} reve={reve} />
+                <DreamCard
+                  key={reve.id}
+                  reve={reve}
+                  onEdit={openEditForm}
+                  onDelete={handleDelete}
+                />
               ))}
             </div>
           )
         })}
       </section>
+
+      {isFormOpen && (
+        <ReveForm
+          reve={editingReve}
+          onClose={closeForm}
+          onSaved={loadReves}
+        />
+      )}
     </>
   )
 }

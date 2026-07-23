@@ -3,6 +3,8 @@ import { participantsLabel } from '../lib/participants'
 
 type MerchItemCardProps = {
   item: MerchItemData
+  onEdit: (item: MerchItemData) => void
+  onDelete: (item: MerchItemData) => void
 }
 
 const PREVIEW_EMOJI = {
@@ -10,9 +12,13 @@ const PREVIEW_EMOJI = {
   photocard: '📸', lightstick: '🪄', vinyl: '💿', cap: '🧢',
 }
 
-function MerchItemCard({ item }: MerchItemCardProps) {
+function MerchItemCard({ item, onEdit, onDelete }: MerchItemCardProps) {
   return (
     <article className="mr-item">
+      <div className="mr-actions">
+        <button title="Modifier" onClick={() => onEdit(item)}>✎</button>
+        <button title="Supprimer" onClick={() => onDelete(item)}>✕</button>
+      </div>
       <div className={`preview ${item.previewStyle}`}>
         <span className="bg-text">{item.bgText}</span>
         <span className="emoji">{PREVIEW_EMOJI[item.previewStyle]}</span>
