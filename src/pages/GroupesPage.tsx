@@ -1,47 +1,51 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import '../styles/groupes.css'
+import '../styles/form.css'
 import Topbar from '../components/TopBar'
 import GroupRow from '../components/GroupRow'
-import type { Groupe } from '../types'
+import GroupeForm from '../components/GroupeForm'
+import type { Groupe, Profil } from '../types'
 
 function GroupesPage() {
   const [groupes, setGroupes] = useState<Groupe[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isFormOpen, setIsFormOpen] = useState(false)
   const [activeFilter, setActiveFilter] = useState<'tous' | 'metal' | 'kpop'>('tous')
   const [searchQuery, setSearchQuery] = useState('')
 
+  async function loadGroupes() {
+    const [{ data: groupeRows }, { data: profilRows }] = await Promise.all([
+      supabase.from('groupes').select('*'),
+      supabase.from('profils').select('*'),
+    ])
+
+    const profils = (profilRows ?? []) as Profil[]
+
+    const formatted: Groupe[] = (groupeRows ?? []).map((row) => {
+      const profil = profils.find((p) => p.id === row.added_by)
+      return {
+        id: row.id,
+        name: row.name,
+        label: row.label ?? '',
+        genre: row.genre,
+        country: row.country,
+        coverInitials: row.cover_initials,
+        loveLevel: row.love_level,
+        seen: row.is_seen,
+        seenLabel: row.seen_label ?? '',
+        addedByName: profil?.display_name ?? '?',
+        addedByGenre: profil?.avatar_style ?? 'kpop',
+        addedDate: new Date(row.created_at).toLocaleDateString('fr-FR'),
+      }
+    })
+
+    setGroupes(formatted)
+    setIsLoading(false)
+  }
+
   useEffect(() => {
-    async function loadGroupes() {
-      const [{ data: groupeRows }, { data: profilRows }] = await Promise.all([
-        supabase.from('groupes').select('*'),
-        supabase.from('profils').select('*'),
-      ])
-
-      const profils = profilRows ?? []
-
-      const formatted: Groupe[] = (groupeRows ?? []).map((row) => {
-        const profil = profils.find((p) => p.id === row.added_by)
-        return {
-          id: row.id,
-          name: row.name,
-          label: row.label ?? '',
-          genre: row.genre,
-          country: row.country,
-          coverInitials: row.cover_initials,
-          loveLevel: row.love_level,
-          seen: row.is_seen,
-          seenLabel: row.seen_label ?? '',
-          addedByName: profil?.display_name ?? '?',
-          addedByGenre: profil?.avatar_style ?? 'kpop',
-          addedDate: new Date(row.created_at).toLocaleDateString('fr-FR'),
-        }
-      })
-
-      setGroupes(formatted)
-      setIsLoading(false)
-    }
-
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- setState après await, donc pas synchrone
     loadGroupes()
   }, [])
 
@@ -68,7 +72,7 @@ function GroupesPage() {
 
   return (
     <>
-      <Topbar currentPage="Groupes" />
+      <Topbar currentPage="Groupes" onAdd={() => setIsFormOpen(true)} />
 
       <div className="page-head">
         <h1 className="page-title">Groupes <span className="accent">suivis</span></h1>
@@ -139,6 +143,13 @@ function GroupesPage() {
           <GroupRow key={groupe.id} groupe={groupe} index={index} />
         ))}
       </section>
+
+      {isFormOpen && (
+        <GroupeForm
+          onClose={() => setIsFormOpen(false)}
+          onSaved={loadGroupes}
+        />
+      )}
     </>
   )
 }
