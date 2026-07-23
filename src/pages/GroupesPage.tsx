@@ -11,6 +11,7 @@ function GroupesPage() {
   const [groupes, setGroupes] = useState<Groupe[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingGroupe, setEditingGroupe] = useState<Groupe | null>(null)
   const [activeFilter, setActiveFilter] = useState<'tous' | 'metal' | 'kpop'>('tous')
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -49,6 +50,37 @@ function GroupesPage() {
     loadGroupes()
   }, [])
 
+  function openCreateForm() {
+    setEditingGroupe(null)
+    setIsFormOpen(true)
+  }
+
+  function openEditForm(groupe: Groupe) {
+    setEditingGroupe(groupe)
+    setIsFormOpen(true)
+  }
+
+  function closeForm() {
+    setIsFormOpen(false)
+    setEditingGroupe(null)
+  }
+
+  async function handleDelete(groupe: Groupe) {
+    const confirmed = window.confirm(
+      `Supprimer « ${groupe.name} » ? Cette action est définitive.`
+    )
+    if (!confirmed) return
+
+    const { error } = await supabase.from('groupes').delete().eq('id', groupe.id)
+
+    if (error) {
+      window.alert('Suppression impossible : ' + error.message)
+      return
+    }
+
+    loadGroupes()
+  }
+
   const filteredGroupes = groupes.filter((g) => {
     const matchesGenre = activeFilter === 'tous' || g.genre === activeFilter
     const matchesSearch = g.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -72,7 +104,7 @@ function GroupesPage() {
 
   return (
     <>
-      <Topbar currentPage="Groupes" onAdd={() => setIsFormOpen(true)} />
+      <Topbar currentPage="Groupes" onAdd={openCreateForm} />
 
       <div className="page-head">
         <h1 className="page-title">Groupes <span className="accent">suivis</span></h1>
@@ -138,15 +170,23 @@ function GroupesPage() {
           <div>Niveau d'amour</div>
           <div>Vu</div>
           <div>Ajouté par</div>
+          <div></div>
         </div>
         {filteredGroupes.map((groupe, index) => (
-          <GroupRow key={groupe.id} groupe={groupe} index={index} />
+          <GroupRow
+            key={groupe.id}
+            groupe={groupe}
+            index={index}
+            onEdit={openEditForm}
+            onDelete={handleDelete}
+          />
         ))}
       </section>
 
       {isFormOpen && (
         <GroupeForm
-          onClose={() => setIsFormOpen(false)}
+          groupe={editingGroupe}
+          onClose={closeForm}
           onSaved={loadGroupes}
         />
       )}
