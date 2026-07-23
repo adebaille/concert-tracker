@@ -13,6 +13,10 @@ export type Concert = {
   id: number
   genre: 'kpop' | 'metal' | 'fest'
   status: 'prevu' | 'passe' | 'annule'
+  type: 'concert' | 'festival'
+  eventDate: string
+  hasTickets: boolean
+  isShared: boolean
   photoLabel: string
   bigBg: string
   date: string
@@ -50,7 +54,14 @@ export type Reve = {
   dateValue: string
   budget: number
   note: string
+  isWatched: boolean
+  isShared: boolean
   participants: Participant[]
+}
+
+export type GroupeOption = {
+  id: number
+  name: string
 }
 
 export type MerchItem = {
@@ -62,8 +73,10 @@ export type MerchItem = {
   name: string
   band: string
   bandNote: string
+  groupeId: number | null
   price: number
   ownerId: string
   isShared: boolean
+  anecdote: string
   participants: Participant[]
 }

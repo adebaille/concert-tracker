@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { resolveParticipants } from '../lib/participants'
 import '../styles/merch.css'
+import '../styles/form.css'
 import Topbar from '../components/TopBar'
 import MerchItemCard from '../components/MerchItemCard'
-import type { MerchItem, Profil } from '../types'
+import MerchForm from '../components/MerchForm'
+import type { MerchItem, GroupeOption, Profil } from '../types'
 
 const CATEGORIES = [
   { key: 'tshirt' as const, label: 'T-shirts', icon: '👕' },
@@ -19,48 +21,91 @@ const CATEGORIES = [
 function MerchPage() {
   const [merchItems, setMerchItems] = useState<MerchItem[]>([])
   const [profils, setProfils] = useState<Profil[]>([])
+  const [groupeOptions, setGroupeOptions] = useState<GroupeOption[]>([])
+  const [currentUserId, setCurrentUserId] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingItem, setEditingItem] = useState<MerchItem | null>(null)
   const [ownerFilter, setOwnerFilter] = useState<string>('tout')
   const [categoryFilter, setCategoryFilter] = useState<string>('toutes')
   const [searchQuery, setSearchQuery] = useState('')
 
-  useEffect(() => {
-    async function loadMerch() {
-      const [{ data: merchRows }, { data: profilRows }, { data: groupeRows }] = await Promise.all([
+  async function loadMerch() {
+    const [{ data: merchRows }, { data: profilRows }, { data: groupeRows }, { data: userData }] =
+      await Promise.all([
         supabase.from('merch').select('*'),
         supabase.from('profils').select('*'),
         supabase.from('groupes').select('id, name'),
+        supabase.auth.getUser(),
       ])
 
-      const profilsData = (profilRows ?? []) as Profil[]
-      const groupes = groupeRows ?? []
-      setProfils(profilsData)
+    const profilsData = (profilRows ?? []) as Profil[]
+    const groupes = (groupeRows ?? []) as GroupeOption[]
 
-      const formatted: MerchItem[] = (merchRows ?? []).map((row) => {
-        const groupe = groupes.find((g) => g.id === row.groupe_id)
+    setProfils(profilsData)
+    setGroupeOptions(groupes)
+    setCurrentUserId(userData.user?.id ?? '')
 
-        return {
-          id: row.id,
-          previewStyle: row.preview_style,
-          category: row.category,
-          bgText: row.name.toUpperCase(),
-          details: `${row.category} · ${row.preview_style}`,
-          name: row.name,
-          band: groupe?.name ?? '—',
-          bandNote: row.band_note ?? '',
-          price: row.price ?? 0,
-          ownerId: row.owner_id,
-          isShared: row.is_shared,
-          participants: resolveParticipants(profilsData, row.owner_id, row.is_shared),
-        }
-      })
+    const formatted: MerchItem[] = (merchRows ?? []).map((row) => {
+      const groupe = groupes.find((g) => g.id === row.groupe_id)
 
-      setMerchItems(formatted)
-      setIsLoading(false)
+      return {
+        id: row.id,
+        previewStyle: row.preview_style,
+        category: row.category,
+        bgText: row.name.toUpperCase(),
+        details: `${row.category} · ${row.preview_style}`,
+        name: row.name,
+        band: groupe?.name ?? '—',
+        bandNote: row.band_note ?? '',
+        groupeId: row.groupe_id,
+        price: row.price ?? 0,
+        ownerId: row.owner_id,
+        isShared: row.is_shared,
+        anecdote: row.anecdote ?? '',
+        participants: resolveParticipants(profilsData, row.owner_id, row.is_shared),
+      }
+    })
+
+    setMerchItems(formatted)
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- setState après await, donc pas synchrone
+    loadMerch()
+  }, [])
+
+  function openCreateForm() {
+    setEditingItem(null)
+    setIsFormOpen(true)
+  }
+
+  function openEditForm(item: MerchItem) {
+    setEditingItem(item)
+    setIsFormOpen(true)
+  }
+
+  function closeForm() {
+    setIsFormOpen(false)
+    setEditingItem(null)
+  }
+
+  async function handleDelete(item: MerchItem) {
+    const confirmed = window.confirm(
+      `Supprimer « ${item.name} » ? Cette action est définitive.`
+    )
+    if (!confirmed) return
+
+    const { error } = await supabase.from('merch').delete().eq('id', item.id)
+
+    if (error) {
+      window.alert('Suppression impossible : ' + error.message)
+      return
     }
 
     loadMerch()
-  }, [])
+  }
 
   const filteredItems = merchItems.filter((item) => {
     const matchesOwner =
@@ -93,7 +138,7 @@ function MerchPage() {
 
   return (
     <>
-      <Topbar currentPage="Inventaire Merch" />
+      <Topbar currentPage="Inventaire Merch" onAdd={openCreateForm} />
 
       <div className="page-head">
         <h1 className="page-title">Inventaire <span className="accent">merch</span></h1>
@@ -202,9 +247,25 @@ function MerchPage() {
 
       <section className="mr-gallery">
         {filteredItems.map((item) => (
-          <MerchItemCard key={item.id} item={item} />
+          <MerchItemCard
+            key={item.id}
+            item={item}
+            onEdit={openEditForm}
+            onDelete={handleDelete}
+          />
         ))}
       </section>
+
+      {isFormOpen && (
+        <MerchForm
+          item={editingItem}
+          groupes={groupeOptions}
+          profils={profils}
+          currentUserId={currentUserId}
+          onClose={closeForm}
+          onSaved={loadMerch}
+        />
+      )}
     </>
   )
 }

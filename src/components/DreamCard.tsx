@@ -3,9 +3,11 @@ import { participantsLabel } from '../lib/participants'
 
 type DreamCardProps = {
   reve: Reve
+  onEdit: (reve: Reve) => void
+  onDelete: (reve: Reve) => void
 }
 
-function DreamCard({ reve }: DreamCardProps) {
+function DreamCard({ reve, onEdit, onDelete }: DreamCardProps) {
   const dateLabel = reve.priority === 'ultime' ? 'Date estimée' : 'Date possible'
   const budgetLabel = reve.priority === 'ultime' ? 'Budget rêvé' : 'Budget'
 
@@ -20,6 +22,7 @@ function DreamCard({ reve }: DreamCardProps) {
           <span className={`badge-genre ${reve.genre}`}>
             {reve.genre === 'kpop' ? 'Kpop' : 'Métal'}
           </span>
+          {reve.isWatched && <span className="label-mono">👀 à surveiller</span>}
         </div>
       </div>
       <div>
@@ -44,6 +47,10 @@ function DreamCard({ reve }: DreamCardProps) {
             ))}
           </div>
           <span className="label-mono">{footLabel}</span>
+        </div>
+        <div className="actions">
+          <button title="Modifier" onClick={() => onEdit(reve)}>✎</button>
+          <button title="Supprimer" onClick={() => onDelete(reve)}>✕</button>
         </div>
       </div>
     </article>
