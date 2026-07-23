@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import type { Groupe } from '../types'
 
 type GroupeFormProps = {
+  groupe: Groupe | null
   onClose: () => void
   onSaved: () => void
 }
@@ -16,8 +18,20 @@ const EMPTY_FORM = {
   seenLabel: '',
 }
 
-function GroupeForm({ onClose, onSaved }: GroupeFormProps) {
-  const [form, setForm] = useState(EMPTY_FORM)
+function GroupeForm({ groupe, onClose, onSaved }: GroupeFormProps) {
+  const [form, setForm] = useState(
+    groupe
+      ? {
+          name: groupe.name,
+          label: groupe.label,
+          genre: groupe.genre,
+          country: groupe.country,
+          loveLevel: groupe.loveLevel,
+          isSeen: groupe.seen,
+          seenLabel: groupe.seenLabel,
+        }
+      : EMPTY_FORM
+  )
   const [errorMessage, setErrorMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
 
@@ -25,14 +39,12 @@ function GroupeForm({ onClose, onSaved }: GroupeFormProps) {
     setForm((previous) => ({ ...previous, [field]: value }))
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setErrorMessage('')
     setIsSaving(true)
 
-    const { data: userData } = await supabase.auth.getUser()
-
-    const { error } = await supabase.from('groupes').insert({
+    const payload = {
       name: form.name,
       label: form.label || null,
       genre: form.genre,
@@ -41,13 +53,23 @@ function GroupeForm({ onClose, onSaved }: GroupeFormProps) {
       love_level: form.loveLevel,
       is_seen: form.isSeen,
       seen_label: form.seenLabel || null,
-      added_by: userData.user?.id,
-    })
+    }
+
+    let response
+
+    if (groupe) {
+      response = await supabase.from('groupes').update(payload).eq('id', groupe.id)
+    } else {
+      const { data: userData } = await supabase.auth.getUser()
+      response = await supabase
+        .from('groupes')
+        .insert({ ...payload, added_by: userData.user?.id })
+    }
 
     setIsSaving(false)
 
-    if (error) {
-      setErrorMessage(error.message)
+    if (response.error) {
+      setErrorMessage(response.error.message)
       return
     }
 
@@ -59,7 +81,7 @@ function GroupeForm({ onClose, onSaved }: GroupeFormProps) {
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
-          <div className="modal-title">Nouveau groupe</div>
+          <div className="modal-title">{groupe ? 'Modifier le groupe' : 'Nouveau groupe'}</div>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
@@ -140,7 +162,7 @@ function GroupeForm({ onClose, onSaved }: GroupeFormProps) {
           <div className="form-actions">
             <button type="button" className="btn-ghost" onClick={onClose}>Annuler</button>
             <button type="submit" className="btn-ghost primary" disabled={isSaving}>
-              {isSaving ? 'Enregistrement...' : 'Ajouter'}
+              {isSaving ? 'Enregistrement...' : groupe ? 'Enregistrer' : 'Ajouter'}
             </button>
           </div>
         </form>

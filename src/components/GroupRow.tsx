@@ -3,11 +3,13 @@ import type { Groupe } from '../types'
 type GroupRowProps = {
   groupe: Groupe
   index: number
+  onEdit: (groupe: Groupe) => void
+  onDelete: (groupe: Groupe) => void
 }
 
 const LOVE_EMOJI = { kpop: '💜', metal: '🔥' }
 
-function GroupRow({ groupe, index }: GroupRowProps) {
+function GroupRow({ groupe, index, onEdit, onDelete }: GroupRowProps) {
   const variant = ['', '2', '3'][index % 3]
   const coverClass = `${groupe.genre}${variant}`
 
@@ -37,6 +39,10 @@ function GroupRow({ groupe, index }: GroupRowProps) {
           <div>{groupe.addedByName}</div>
           <div className="date">{groupe.addedDate}</div>
         </div>
+      </div>
+      <div className="row-actions">
+        <button title="Modifier" onClick={() => onEdit(groupe)}>✎</button>
+        <button title="Supprimer" onClick={() => onDelete(groupe)}>✕</button>
       </div>
     </div>
   )
