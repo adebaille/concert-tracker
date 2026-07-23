@@ -1,8 +1,9 @@
 type TopbarProps = {
   currentPage: string
+  onAdd?: () => void
 }
 
-function Topbar({ currentPage }: TopbarProps) {
+function Topbar({ currentPage, onAdd }: TopbarProps) {
   return (
     <div className="topbar">
       <div className="crumbs">
@@ -14,12 +15,13 @@ function Topbar({ currentPage }: TopbarProps) {
         <div className="user-pill">
           <div className="avatar kpop">A</div>
           <span className="label">Connectée</span>
-          <span className="name">Alison</span>
         </div>
-        <button className="btn-add">
-          <span className="plus">+</span>
-          Ajouter
-        </button>
+        {onAdd && (
+          <button className="btn-add" onClick={onAdd}>
+            <span className="plus">+</span>
+            Ajouter
+          </button>
+        )}
       </div>
     </div>
   )
