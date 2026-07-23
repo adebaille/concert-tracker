@@ -1,0 +1,77 @@
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(5, 5, 8, 0.7);
+  backdrop-filter: blur(4px);
+  display: grid; place-items: center;
+  z-index: 50;
+  padding: 24px;
+}
+.modal {
+  background: var(--bg-elev-1);
+  border: 0.5px solid var(--hair-strong);
+  border-radius: var(--r-lg);
+  padding: 28px;
+  width: 100%;
+  max-width: 460px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.modal-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 22px;
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 0.04em;
+}
+.modal-close {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--text-muted);
+}
+.modal-close:hover { color: var(--text); }
+
+.form-grid { display: flex; flex-direction: column; gap: 16px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.field input[type="text"],
+.field input[type="number"],
+.field input[type="date"],
+.field input[type="datetime-local"],
+.field select,
+.field textarea {
+  background: var(--bg-elev-2);
+  border: 0.5px solid var(--hair);
+  border-radius: var(--r-sm, 8px);
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color var(--t-fast) var(--ease);
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--kpop);
+}
+.field textarea { resize: vertical; min-height: 70px; }
+.field-check {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+}
+.form-error {
+  font-size: 12px;
+  color: var(--metal);
+}
+.form-actions {
+  display: flex; gap: 10px; justify-content: flex-end;
+  margin-top: 6px;
+}
