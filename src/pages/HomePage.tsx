@@ -5,7 +5,8 @@ import { resolveParticipants, participantsLabel } from '../lib/participants'
 import '../styles/home.css'
 import Topbar from '../components/TopBar'
 import Countdown from '../components/Countdown'
-import type { Participant, Profil } from '../types'
+import type { Concert, Participant, Profil } from '../types'
+import { buildConcertICS, downloadICS } from '../lib/calendar'
 
 type ConcertRow = {
   id: number
@@ -123,6 +124,19 @@ function HomePage() {
     )
   }
 
+  function handleAddNextToCalendar() {
+    if (!nextConcert) return
+    const content = buildConcertICS({
+      id: nextConcert.id,
+      name: nextConcert.name,
+      eventDate: nextConcert.event_date,
+      venue: nextConcert.venue,
+      city: nextConcert.city,
+      setlist: undefined,
+    } as Concert)
+    downloadICS(`${nextConcert.name}.ics`, content)
+  }
+
   return (
     <>
       <Topbar currentPage="Accueil" />
@@ -130,8 +144,8 @@ function HomePage() {
       <section className="hero">
         <div>
           <h1 className="hero-title">
-            NOTRE <span className="gradient">UNIVERS</span><br />
-            <span className="outlined">MUSICAL</span>
+            <span className="gradient">CONCERT</span><br />
+            <span className="outlined">TRACKER</span>
           </h1>
           <div className="hero-meta">
             <span className="tag metal">🤘 Métal</span>
@@ -199,8 +213,7 @@ function HomePage() {
               </div>
 
               <div className="nc-actions">
-                <button className="btn-ghost">Voir le détail</button>
-                <button className="btn-ghost primary">Ajouter au calendrier</button>
+                <button className="btn-ghost primary" onClick={handleAddNextToCalendar}>Ajouter au calendrier</button>
               </div>
             </div>
           </section>
