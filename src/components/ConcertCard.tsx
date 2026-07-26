@@ -1,5 +1,6 @@
 import type { Concert } from '../types'
 import { participantsLabel } from '../lib/participants'
+import { buildConcertICS, downloadICS } from '../lib/calendar'
 
 type ConcertCardProps = {
   concert: Concert
@@ -14,9 +15,16 @@ const STATUS_LABELS = {
 }
 
 function ConcertCard({ concert, onEdit, onDelete }: ConcertCardProps) {
+  function handleAddToCalendar() {
+    const content = buildConcertICS(concert)
+    downloadICS(`${concert.name}.ics`, content)
+  }
   return (
     <article className="concert-card">
       <div className="card-actions">
+        {concert.status === 'prevu' && (
+          <button title="Ajouter à l'agenda" onClick={handleAddToCalendar}>📅</button>
+        )}
         <button title="Modifier" onClick={() => onEdit(concert)}>✎</button>
         <button title="Supprimer" onClick={() => onDelete(concert)}>✕</button>
       </div>
