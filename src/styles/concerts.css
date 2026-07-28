@@ -288,4 +288,7 @@
   .concerts-grid {
     grid-template-columns: 1fr;
   }
+  .card-actions {
+    opacity: 1;
+  }
 }

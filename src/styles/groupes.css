@@ -254,3 +254,62 @@
   color: var(--text);
   background: rgba(255, 255, 255, 0.06);
 }
+@media (max-width: 768px) {
+  .gr-table {
+    background: transparent;
+    border: none;
+  }
+
+  .gr-row.head {
+    display: none;
+  }
+
+  .gr-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 16px;
+    border: 0.5px solid var(--hair);
+    border-radius: var(--r-lg);
+    background: var(--bg-elev-1);
+    margin-bottom: 12px;
+  }
+
+  /* Le numéro de rang n'a plus de sens en cartes */
+  .gr-row .col-num { display: none; }
+
+  /* Nom + pochette : en tête de carte, mis en valeur */
+  .gr-row .col-name {
+    padding-bottom: 10px;
+    border-bottom: 0.5px solid var(--hair);
+  }
+
+  /* Chaque info : libellé à gauche (généré en CSS), valeur à droite */
+  .gr-row > div:not(.col-name):not(.row-actions) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .gr-row > div:not(.col-name):not(.row-actions)::before {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* On nomme chaque info dans son ordre d'apparition */
+  .gr-row > div:nth-of-type(3)::before { content: "Genre"; }
+  .gr-row > div:nth-of-type(4)::before { content: "Pays"; }
+  .gr-row > div:nth-of-type(5)::before { content: "Amour"; }
+  .gr-row > div:nth-of-type(6)::before { content: "Vu"; }
+  .gr-row > div:nth-of-type(7)::before { content: "Ajouté par"; }
+
+  /* Actions : visibles sans survol, alignées à droite */
+  .gr-row .row-actions {
+    opacity: 1;
+    justify-content: flex-end;
+  }
+}
