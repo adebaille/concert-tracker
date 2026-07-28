@@ -273,3 +273,7 @@
 .mr-actions button:hover {
   background: rgba(255, 255, 255, 0.08);
 }
+@media (max-width: 768px) {
+  .mr-summary { grid-template-columns: 1fr; }
+  .mr-gallery { grid-template-columns: 1fr 1fr; }
+}
