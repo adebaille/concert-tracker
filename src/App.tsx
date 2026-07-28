@@ -63,13 +63,6 @@ function App() {
             ))}
           </nav>
 
-          <div className="nav-label" style={{ marginTop: 20 }}>Outils</div>
-          <nav className="nav">
-            <NavLink to="/parametres" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-              Paramètres
-            </NavLink>
-          </nav>
-
           <div className="sidebar-spacer"></div>
 
           <div className="duo">
@@ -84,9 +77,6 @@ function App() {
               </div>
               <div className="status-dot" title="Connectée"></div>
             </div>
-            <button onClick={() => supabase.auth.signOut()} className="section-link" style={{ marginTop: 10 }}>
-              Se déconnecter
-            </button>
           </div>
         </aside>
 
