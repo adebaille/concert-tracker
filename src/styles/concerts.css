@@ -288,7 +288,4 @@
   .concerts-grid {
     grid-template-columns: 1fr;
   }
-  .filters {
-    flex-wrap: wrap;
-  }
 }

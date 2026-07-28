@@ -254,3 +254,8 @@
   color: var(--text);
   background: rgba(255, 255, 255, 0.1);
 }
+@media (max-width: 768px) {
+  .wl-summary { grid-template-columns: 1fr 1fr; }
+  .wl-board { grid-template-columns: 1fr; }
+  .wl-col { min-height: auto; }
+}
