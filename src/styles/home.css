@@ -486,3 +486,30 @@
   letter-spacing: 0.1em;
   margin-top: 4px;
 }
+@media (max-width: 768px) {
+  /* Le titre géant déborde à 132px — on le réduit */
+  .hero-title {
+    font-size: 64px;
+  }
+  .hero {
+    grid-template-columns: 1fr;
+  }
+  .hero-right {
+    text-align: left;
+  }
+
+  /* La carte "prochain concert" : poster au-dessus, infos en dessous */
+  .next-concert {
+    grid-template-columns: 1fr;
+  }
+
+  /* Les 4 stats : 2 par ligne au lieu de 4 */
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Les deux panneaux du bas s'empilent */
+  .bottom {
+    grid-template-columns: 1fr;
+  }
+}
