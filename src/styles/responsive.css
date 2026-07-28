@@ -1,0 +1,30 @@
+/* ============================================
+   Responsive — surcouche mobile
+   Sur petit écran, la sidebar laisse place à une
+   barre de navigation fixée en bas.
+   ============================================ */
+
+/* Par défaut (desktop), la barre du bas est masquée */
+.bottom-nav { display: none; }
+
+.bn-ico { font-size: 20px; line-height: 1; }
+
+@media (max-width: 768px) {
+  /* Une seule colonne : plus d'espace réservé à la sidebar */
+  .app { grid-template-columns: 1fr; }
+
+  /* La sidebar disparaît, la barre du bas prend le relais */
+  .sidebar { display: none; }
+
+  /* Moins de marge sur les côtés, et de la place en bas
+     pour que le contenu ne passe pas sous la barre fixe */
+  .main { padding: 20px 16px 90px; }
+
+  /* La barre du bas apparaît, collée en bas de l'écran */
+  .bottom-nav {
+    display: grid;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 40;
+  }
+}
