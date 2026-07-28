@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router'
+import { Home, Ticket, Music, Star, ShoppingBag } from 'lucide-react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabaseClient'
 import LoginPage from './pages/LoginPage'
 
 const NAV_ITEMS = [
-  { id: 'accueil', label: 'Accueil', to: '/', icon: '🏠' },
-  { id: 'concerts', label: 'Concerts & Festivals', to: '/concerts', icon: '🎫' },
-  { id: 'groupes', label: 'Groupes', to: '/groupes', icon: '🎸' },
-  { id: 'wishlist', label: 'Wishlist', to: '/wishlist', icon: '⭐' },
-  { id: 'merch', label: 'Inventaire Merch', to: '/merch', icon: '🛍️' },
+  { id: 'accueil', label: 'Accueil', to: '/', icon: Home },
+  { id: 'concerts', label: 'Concerts & Festivals', to: '/concerts', icon: Ticket },
+  { id: 'groupes', label: 'Groupes', to: '/groupes', icon: Music },
+  { id: 'wishlist', label: 'Wishlist', to: '/wishlist', icon: Star },
+  { id: 'merch', label: 'Merch', to: '/merch', icon: ShoppingBag },
 ]
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
                 end={item.to === '/'}
                 className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               >
+                <item.icon className="ico" />
                 {item.label}
               </NavLink>
             ))}
@@ -101,7 +103,7 @@ function App() {
             end={item.to === '/'}
             className={({ isActive }) => `bn-item ${isActive ? 'active' : ''}`}
           >
-            <span className="bn-ico">{item.icon}</span>
+            <item.icon className="ico" />
             {item.label.split(' ')[0]}
           </NavLink>
         ))}
