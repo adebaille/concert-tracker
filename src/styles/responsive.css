@@ -28,3 +28,13 @@
     z-index: 40;
   }
 }
+@media (max-width: 768px) {
+  /* Le fil d'ariane fait doublon avec la barre du bas */
+  .crumbs {
+    display: none;
+  }
+  /* La topbar n'a plus qu'un élément à droite : on le pousse à droite */
+  .topbar {
+    justify-content: flex-end;
+  }
+}

@@ -284,3 +284,11 @@
 .concerts-grid.view-liste {
   grid-template-columns: 1fr;
 }
+@media (max-width: 768px) {
+  .concerts-grid {
+    grid-template-columns: 1fr;
+  }
+  .filters {
+    flex-wrap: wrap;
+  }
+}
