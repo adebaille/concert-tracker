@@ -11,7 +11,7 @@ export type Participant = {
 
 export type Concert = {
   id: number
-  genre: 'kpop' | 'metal' | 'fest'
+  genre: 'kpop' | 'metal'
   status: 'prevu' | 'passe' | 'annule'
   type: 'concert' | 'festival'
   eventDate: string
