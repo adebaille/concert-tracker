@@ -18,18 +18,18 @@ const CATEGORY_OPTIONS = [
   { value: 'cd-album', label: 'CD / Album' },
   { value: 'photocard', label: 'Photocard' },
   { value: 'lightstick', label: 'Lightstick' },
-  { value: 'casquette', label: 'Casquette' },
+  { value: 'bijou', label: 'Bijou' },
 ]
 
 const PREVIEW_OPTIONS = [
-  { value: 'tee', label: '👕 T-shirt' },
-  { value: 'hoodie', label: '🧥 Hoodie' },
-  { value: 'poster', label: '📜 Poster' },
-  { value: 'cd', label: '💿 CD' },
-  { value: 'vinyl', label: '💿 Vinyle' },
-  { value: 'photocard', label: '📸 Photocard' },
-  { value: 'lightstick', label: '🪄 Lightstick' },
-  { value: 'cap', label: '🧢 Casquette' },
+  { value: 'tee', label: 'T-shirt' },
+  { value: 'hoodie', label: 'Hoodie' },
+  { value: 'poster', label: 'Poster' },
+  { value: 'cd', label: 'CD' },
+  { value: 'vinyl', label: 'Vinyle' },
+  { value: 'photocard', label: 'Photocard' },
+  { value: 'lightstick', label: 'Lightstick' },
+  { value: 'cap', label: 'Bijou' },
 ]
 
 function MerchForm({ item, groupes, profils, currentUserId, onClose, onSaved }: MerchFormProps) {

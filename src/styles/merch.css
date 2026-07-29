@@ -284,3 +284,11 @@
     opacity: 1;
   }
 }
+.split-row .name .avatar {
+  margin-left: 0;
+}
+.preview-icon {
+  position: relative;
+  z-index: 1;
+  color: rgba(255, 255, 255, 0.85);
+}

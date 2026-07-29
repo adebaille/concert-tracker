@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Shirt, Layers, ScrollText, Disc3, Image, Sparkles, Gem, Globe } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
 import { resolveParticipants } from '../lib/participants'
 import '../styles/merch.css'
@@ -9,13 +10,13 @@ import MerchForm from '../components/MerchForm'
 import type { MerchItem, GroupeOption, Profil } from '../types'
 
 const CATEGORIES = [
-  { key: 'tshirt' as const, label: 'T-shirts', icon: '👕' },
-  { key: 'hoodie' as const, label: 'Hoodies', icon: '🧥' },
-  { key: 'poster' as const, label: 'Posters', icon: '📜' },
-  { key: 'cd-album' as const, label: 'CDs / Albums', icon: '💿' },
-  { key: 'photocard' as const, label: 'Photocards', icon: '📸' },
-  { key: 'lightstick' as const, label: 'Lightsticks', icon: '🪄' },
-  { key: 'casquette' as const, label: 'Casquettes', icon: '🧢' },
+  { key: 'tshirt' as const, label: 'T-shirts', icon: Shirt },
+  { key: 'hoodie' as const, label: 'Hoodies', icon: Layers },
+  { key: 'poster' as const, label: 'Posters', icon: ScrollText },
+  { key: 'cd-album' as const, label: 'CDs / Albums', icon: Disc3 },
+  { key: 'photocard' as const, label: 'Photocards', icon: Image },
+  { key: 'lightstick' as const, label: 'Lightsticks', icon: Sparkles },
+  { key: 'bijou' as const, label: 'Bijoux', icon: Gem },
 ]
 
 function MerchPage() {
@@ -130,7 +131,7 @@ function MerchPage() {
   if (isLoading) {
     return (
       <>
-        <Topbar currentPage="Inventaire Merch" />
+        <Topbar currentPage="Merch" />
         <p style={{ padding: 24 }}>Chargement de l'inventaire...</p>
       </>
     )
@@ -138,7 +139,7 @@ function MerchPage() {
 
   return (
     <>
-      <Topbar currentPage="Inventaire Merch" onAdd={openCreateForm} />
+      <Topbar currentPage="Merch" onAdd={openCreateForm} />
 
       <div className="page-head">
         <h1 className="page-title">Inventaire <span className="accent">merch</span></h1>
@@ -229,7 +230,7 @@ function MerchPage() {
           className={`cat-pill ${categoryFilter === 'toutes' ? 'active' : ''}`}
           onClick={() => setCategoryFilter('toutes')}
         >
-          <span className="e">🌐</span> Toutes les catégories · {merchItems.length}
+          <Globe size={14} /> Toutes les catégories · {merchItems.length}
         </button>
         {CATEGORIES.map((cat) => {
           const count = merchItems.filter((item) => item.category === cat.key).length
@@ -239,7 +240,7 @@ function MerchPage() {
               className={`cat-pill ${categoryFilter === cat.key ? 'active' : ''}`}
               onClick={() => setCategoryFilter(cat.key)}
             >
-              <span className="e">{cat.icon}</span> {cat.label} · {count}
+              <cat.icon size={14} /> {cat.label} · {count}
             </button>
           )
         })}
