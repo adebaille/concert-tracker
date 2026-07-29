@@ -1,3 +1,4 @@
+import { Shirt, Layers, ScrollText, Disc3, Image, Sparkles, Gem } from 'lucide-react'
 import type { MerchItem as MerchItemData } from '../types'
 import { participantsLabel } from '../lib/participants'
 
@@ -7,12 +8,20 @@ type MerchItemCardProps = {
   onDelete: (item: MerchItemData) => void
 }
 
-const PREVIEW_EMOJI = {
-  tee: '👕', hoodie: '🧥', poster: '📜', cd: '💿',
-  photocard: '📸', lightstick: '🪄', vinyl: '💿', cap: '🧢',
+const PREVIEW_ICON = {
+  tee: Shirt,
+  hoodie: Layers,
+  poster: ScrollText,
+  cd: Disc3,
+  vinyl: Disc3,
+  photocard: Image,
+  lightstick: Sparkles,
+  cap: Gem,
 }
 
 function MerchItemCard({ item, onEdit, onDelete }: MerchItemCardProps) {
+  const Icon = PREVIEW_ICON[item.previewStyle]
+
   return (
     <article className="mr-item">
       <div className="mr-actions">
@@ -21,7 +30,7 @@ function MerchItemCard({ item, onEdit, onDelete }: MerchItemCardProps) {
       </div>
       <div className={`preview ${item.previewStyle}`}>
         <span className="bg-text">{item.bgText}</span>
-        <span className="emoji">{PREVIEW_EMOJI[item.previewStyle]}</span>
+        <Icon className="preview-icon" size={34} />
       </div>
       <div className="body">
         <div className="cat">{item.details}</div>
