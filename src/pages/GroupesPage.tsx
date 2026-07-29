@@ -5,10 +5,11 @@ import '../styles/form.css'
 import Topbar from '../components/TopBar'
 import GroupRow from '../components/GroupRow'
 import GroupeForm from '../components/GroupeForm'
-import type { Groupe, Profil } from '../types'
+import type { Groupe, Profil, SeenEntry } from '../types'
 
 function GroupesPage() {
   const [groupes, setGroupes] = useState<Groupe[]>([])
+  const [profils, setProfils] = useState<Profil[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingGroupe, setEditingGroupe] = useState<Groupe | null>(null)
@@ -16,15 +17,31 @@ function GroupesPage() {
   const [searchQuery, setSearchQuery] = useState('')
 
   async function loadGroupes() {
-    const [{ data: groupeRows }, { data: profilRows }] = await Promise.all([
+    const [{ data: groupeRows }, { data: profilRows }, { data: vueRows }] = await Promise.all([
       supabase.from('groupes').select('*'),
       supabase.from('profils').select('*'),
+      supabase.from('groupe_vues').select('*'),
     ])
 
-    const profils = (profilRows ?? []) as Profil[]
+    const profilsData = (profilRows ?? []) as Profil[]
+    const vues = vueRows ?? []
+    setProfils(profilsData)
 
     const formatted: Groupe[] = (groupeRows ?? []).map((row) => {
-      const profil = profils.find((p) => p.id === row.added_by)
+      const profil = profilsData.find((p) => p.id === row.added_by)
+
+      const seenEntries: SeenEntry[] = vues
+        .filter((v) => v.groupe_id === row.id)
+        .map((v) => {
+          const p = profilsData.find((profil) => profil.id === v.user_id)
+          return {
+            userId: v.user_id,
+            name: p?.display_name ?? '?',
+            avatarStyle: p?.avatar_style ?? 'kpop',
+            count: v.seen_count,
+          }
+        })
+
       return {
         id: row.id,
         name: row.name,
@@ -33,11 +50,10 @@ function GroupesPage() {
         country: row.country,
         coverInitials: row.cover_initials,
         loveLevel: row.love_level,
-        seen: row.is_seen,
-        seenLabel: row.seen_label ?? '',
         addedByName: profil?.display_name ?? '?',
         addedByGenre: profil?.avatar_style ?? 'kpop',
         addedDate: new Date(row.created_at).toLocaleDateString('fr-FR'),
+        seenEntries,
       }
     })
 
@@ -89,7 +105,7 @@ function GroupesPage() {
 
   const metalCount = groupes.filter((g) => g.genre === 'metal').length
   const kpopCount = groupes.filter((g) => g.genre === 'kpop').length
-  const seenCount = groupes.filter((g) => g.seen).length
+  const seenCount = groupes.filter((g) => g.seenEntries.some((e) => e.count > 0)).length
   const seenPercent = groupes.length > 0 ? Math.round((seenCount / groupes.length) * 100) : 0
   const countriesCount = new Set(groupes.map((g) => g.country)).size
 
@@ -186,6 +202,7 @@ function GroupesPage() {
       {isFormOpen && (
         <GroupeForm
           groupe={editingGroupe}
+          profils={profils}
           onClose={closeForm}
           onSaved={loadGroupes}
         />
