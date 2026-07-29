@@ -31,7 +31,20 @@ function GroupRow({ groupe, index, onEdit, onDelete }: GroupRowProps) {
       <div className="col-style">{groupe.country}</div>
       <div className="love">{LOVE_EMOJI[groupe.genre].repeat(groupe.loveLevel)}</div>
       <div>
-        <span className={groupe.seen ? 'seen-yes' : 'seen-no'}>{groupe.seenLabel}</span>
+        {groupe.seenEntries.some((entry) => entry.count > 0) ? (
+          <div className="seen-detail">
+            {groupe.seenEntries
+              .filter((entry) => entry.count > 0)
+              .map((entry) => (
+                <span key={entry.userId} className="seen-person">
+                  <span className={`avatar ${entry.avatarStyle}`}>{entry.name[0]}</span>
+                  ×{entry.count}
+                </span>
+              ))}
+          </div>
+        ) : (
+          <span className="seen-no">Pas encore</span>
+        )}
       </div>
       <div className="col-added">
         <div className={`avatar ${groupe.addedByGenre}`}>{groupe.addedByName[0]}</div>

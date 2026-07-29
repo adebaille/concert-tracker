@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import type { Groupe } from '../types'
+import type { Groupe, Profil } from '../types'
 
 type GroupeFormProps = {
   groupe: Groupe | null
+  profils: Profil[]
   onClose: () => void
   onSaved: () => void
 }
@@ -14,11 +15,9 @@ const EMPTY_FORM = {
   genre: 'kpop',
   country: '',
   loveLevel: 3,
-  isSeen: false,
-  seenLabel: '',
 }
 
-function GroupeForm({ groupe, onClose, onSaved }: GroupeFormProps) {
+function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
   const [form, setForm] = useState(
     groupe
       ? {
@@ -27,19 +26,32 @@ function GroupeForm({ groupe, onClose, onSaved }: GroupeFormProps) {
           genre: groupe.genre,
           country: groupe.country,
           loveLevel: groupe.loveLevel,
-          isSeen: groupe.seen,
-          seenLabel: groupe.seenLabel,
         }
       : EMPTY_FORM
   )
+
+  // Un compteur par profil, indexé par user_id : { "uuid-alison": 3, "uuid-emeline": 1 }
+  const [seenCounts, setSeenCounts] = useState<Record<string, number>>(() => {
+    const initial: Record<string, number> = {}
+    for (const profil of profils) {
+      const existing = groupe?.seenEntries.find((e) => e.userId === profil.id)
+      initial[profil.id] = existing ? existing.count : 0
+    }
+    return initial
+  })
+
   const [errorMessage, setErrorMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
 
-  function updateField(field: keyof typeof EMPTY_FORM, value: string | number | boolean) {
+  function updateField(field: keyof typeof EMPTY_FORM, value: string | number) {
     setForm((previous) => ({ ...previous, [field]: value }))
   }
 
-async function handleSubmit(e: React.FormEvent) {
+  function updateSeenCount(userId: string, value: number) {
+    setSeenCounts((previous) => ({ ...previous, [userId]: value }))
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setErrorMessage('')
     setIsSaving(true)
@@ -51,25 +63,39 @@ async function handleSubmit(e: React.FormEvent) {
       country: form.country,
       cover_initials: form.name.slice(0, 2).toUpperCase(),
       love_level: form.loveLevel,
-      is_seen: form.isSeen,
-      seen_label: form.seenLabel || null,
     }
 
-    let response
+    let groupeId = groupe?.id
 
     if (groupe) {
-      response = await supabase.from('groupes').update(payload).eq('id', groupe.id)
+      const { error } = await supabase.from('groupes').update(payload).eq('id', groupe.id)
+      if (error) { setErrorMessage(error.message); setIsSaving(false); return }
     } else {
       const { data: userData } = await supabase.auth.getUser()
-      response = await supabase
+      const { data, error } = await supabase
         .from('groupes')
         .insert({ ...payload, added_by: userData.user?.id })
+        .select('id')
+        .single()
+      if (error) { setErrorMessage(error.message); setIsSaving(false); return }
+      groupeId = data.id
     }
+
+    // Enregistrer les vues : une ligne par personne, dans groupe_vues
+    const rows = profils.map((profil) => ({
+      groupe_id: groupeId,
+      user_id: profil.id,
+      seen_count: seenCounts[profil.id] ?? 0,
+    }))
+
+    const { error: seenError } = await supabase
+      .from('groupe_vues')
+      .upsert(rows, { onConflict: 'groupe_id,user_id' })
 
     setIsSaving(false)
 
-    if (response.error) {
-      setErrorMessage(response.error.message)
+    if (seenError) {
+      setErrorMessage(seenError.message)
       return
     }
 
@@ -138,23 +164,20 @@ async function handleSubmit(e: React.FormEvent) {
             </select>
           </div>
 
-          <label className="field-check">
-            <input
-              type="checkbox"
-              checked={form.isSeen}
-              onChange={(e) => updateField('isSeen', e.target.checked)}
-            />
-            Déjà vu en concert
-          </label>
-
           <div className="field">
-            <label>Mention « vu »</label>
-            <input
-              type="text"
-              placeholder={form.isSeen ? '3 fois' : 'Pas encore'}
-              value={form.seenLabel}
-              onChange={(e) => updateField('seenLabel', e.target.value)}
-            />
+            <label>Vu en concert — nombre de fois par personne</label>
+            {profils.map((profil) => (
+              <div key={profil.id} className="seen-input-row">
+                <span className={`avatar ${profil.avatar_style}`}>{profil.display_name[0]}</span>
+                <span className="seen-input-name">{profil.display_name}</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={seenCounts[profil.id] ?? 0}
+                  onChange={(e) => updateSeenCount(profil.id, Number(e.target.value))}
+                />
+              </div>
+            ))}
           </div>
 
           {errorMessage && <p className="form-error">{errorMessage}</p>}

@@ -7,10 +7,9 @@
 }
 .gr-row {
   display: grid;
-  grid-template-columns: 56px minmax(
-      180px,
-      1.6fr
-    ) 110px 100px 130px 90px 130px 100px;
+  grid-template-columns:
+    56px minmax(180px, 1.6fr)
+    110px 100px 130px 90px 130px 100px;
   align-items: center;
   gap: var(--s-4);
   padding: 14px 22px;
@@ -277,7 +276,9 @@
   }
 
   /* Le numéro de rang n'a plus de sens en cartes */
-  .gr-row .col-num { display: none; }
+  .gr-row .col-num {
+    display: none;
+  }
 
   /* Nom + pochette : en tête de carte, mis en valeur */
   .gr-row .col-name {
@@ -301,15 +302,49 @@
   }
 
   /* On nomme chaque info dans son ordre d'apparition */
-  .gr-row > div:nth-of-type(3)::before { content: "Genre"; }
-  .gr-row > div:nth-of-type(4)::before { content: "Pays"; }
-  .gr-row > div:nth-of-type(5)::before { content: "Amour"; }
-  .gr-row > div:nth-of-type(6)::before { content: "Vu"; }
-  .gr-row > div:nth-of-type(7)::before { content: "Ajouté par"; }
+  .gr-row > div:nth-of-type(3)::before {
+    content: "Genre";
+  }
+  .gr-row > div:nth-of-type(4)::before {
+    content: "Pays";
+  }
+  .gr-row > div:nth-of-type(5)::before {
+    content: "Amour";
+  }
+  .gr-row > div:nth-of-type(6)::before {
+    content: "Vu";
+  }
+  .gr-row > div:nth-of-type(7)::before {
+    content: "Ajouté par";
+  }
 
   /* Actions : visibles sans survol, alignées à droite */
   .gr-row .row-actions {
     opacity: 1;
     justify-content: flex-end;
   }
+}
+.seen-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+.seen-person {
+  display: grid;
+  grid-template-columns: 18px auto;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1;
+}
+.seen-person .avatar {
+  width: 16px;
+  height: 16px;
+  font-size: 8px;
+  border-width: 1px;
+  flex-shrink: 0;
+  margin-left: 0;
 }

@@ -43,8 +43,8 @@ function App() {
           <div className="brand">
             <div className="brand-mark"></div>
             <div>
-              <div className="brand-name">NOTRE UNIVERS</div>
-              <div className="brand-sub">Musical · v1.0</div>
+              <div className="brand-name">CONCERT TRACKER</div>
+              <div className="brand-sub">v1.0</div>
             </div>
           </div>
 

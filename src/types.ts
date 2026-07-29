@@ -30,6 +30,13 @@ export type Concert = {
   anecdote?: string
 }
 
+export type SeenEntry = {
+  userId: string
+  name: string
+  avatarStyle: 'kpop' | 'metal'
+  count: number
+}
+
 export type Groupe = {
   id: number
   name: string
@@ -38,11 +45,10 @@ export type Groupe = {
   country: string
   coverInitials: string
   loveLevel: number
-  seen: boolean
-  seenLabel: string
   addedByName: string
   addedByGenre: 'kpop' | 'metal'
   addedDate: string
+  seenEntries: SeenEntry[]
 }
 
 export type Reve = {

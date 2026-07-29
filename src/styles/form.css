@@ -1,8 +1,10 @@
 .modal-backdrop {
-  position: fixed; inset: 0;
+  position: fixed;
+  inset: 0;
   background: rgba(5, 5, 8, 0.7);
   backdrop-filter: blur(4px);
-  display: grid; place-items: center;
+  display: grid;
+  place-items: center;
   z-index: 50;
   padding: 24px;
 }
@@ -17,7 +19,9 @@
   overflow-y: auto;
 }
 .modal-head {
-  display: flex; align-items: baseline; justify-content: space-between;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
   margin-bottom: 22px;
 }
 .modal-title {
@@ -30,11 +34,25 @@
   font-size: 18px;
   color: var(--text-muted);
 }
-.modal-close:hover { color: var(--text); }
+.modal-close:hover {
+  color: var(--text);
+}
 
-.form-grid { display: flex; flex-direction: column; gap: 16px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.field { display: flex; flex-direction: column; gap: 6px; }
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 .field label {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -58,12 +76,19 @@
   outline: none;
   transition: border-color var(--t-fast) var(--ease);
 }
-.field input:focus, .field select:focus, .field textarea:focus {
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
   border-color: var(--kpop);
 }
-.field textarea { resize: vertical; min-height: 70px; }
+.field textarea {
+  resize: vertical;
+  min-height: 70px;
+}
 .field-check {
-  display: flex; align-items: center; gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 13px;
   color: var(--text);
 }
@@ -72,6 +97,21 @@
   color: var(--metal);
 }
 .form-actions {
-  display: flex; gap: 10px; justify-content: flex-end;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
   margin-top: 6px;
+}
+.seen-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.seen-input-name {
+  flex: 1;
+  font-size: 13px;
+}
+.seen-input-row input {
+  width: 80px;
 }
