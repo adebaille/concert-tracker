@@ -284,9 +284,6 @@
     opacity: 1;
   }
 }
-.split-row .name .avatar {
-  margin-left: 0;
-}
 .preview-icon {
   position: relative;
   z-index: 1;

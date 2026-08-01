@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router'
 import { supabase } from '../lib/supabaseClient'
+import type { Profil } from '../types'
 import '../styles/account-menu.css'
 
 type TopbarProps = {
@@ -10,7 +11,26 @@ type TopbarProps = {
 
 function Topbar({ currentPage, onAdd }: TopbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [profil, setProfil] = useState<Profil | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    async function loadProfil() {
+      const { data: userData } = await supabase.auth.getUser()
+      const userId = userData.user?.id
+      if (!userId) return
+
+      const { data } = await supabase
+        .from('profils')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      setProfil(data)
+    }
+
+    loadProfil()
+  }, [])
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -22,6 +42,9 @@ function Topbar({ currentPage, onAdd }: TopbarProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  const displayName = profil?.display_name ?? '…'
+  const avatarStyle = profil?.avatar_style ?? 'kpop'
+
   return (
     <div className="topbar">
       <div className="crumbs">
@@ -32,8 +55,8 @@ function Topbar({ currentPage, onAdd }: TopbarProps) {
       <div className="topbar-right">
         <div className="account" ref={menuRef}>
           <button className="user-pill" onClick={() => setMenuOpen((open) => !open)}>
-            <div className="avatar kpop">A</div>
-            <span className="label">Mon compte</span>
+            <div className={`avatar ${avatarStyle}`}>{displayName[0]}</div>
+            <span className="label">{displayName}</span>
           </button>
           {menuOpen && (
             <div className="account-menu">

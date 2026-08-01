@@ -26,8 +26,8 @@ function LoginPage() {
     <div className="auth-wrap">
       <div className="auth-card">
         <div className="auth-brand">
-          <div className="brand-name">NOTRE <span className="accent">UNIVERS</span></div>
-          <div className="brand-sub">Musical · connexion</div>
+          <div className="brand-name">CONCERT <span className="accent">TRACKER</span></div>
+          <div className="brand-sub">Connexion</div>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
