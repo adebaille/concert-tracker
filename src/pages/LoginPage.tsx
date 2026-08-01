@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { supabase } from '../lib/supabaseClient'
+import '../styles/auth.css'
 
 function LoginPage() {
   const [email, setEmail] = useState('')
@@ -21,28 +23,44 @@ function LoginPage() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 320, margin: '120px auto' }}>
-      <h1 className="page-title">Connexion</h1>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        {errorMessage && <p style={{ color: 'var(--metal)', fontSize: 13 }}>{errorMessage}</p>}
-        <button className="btn-ghost primary" type="submit" disabled={isLoading}>
-          {isLoading ? 'Connexion...' : 'Se connecter'}
-        </button>
-      </form>
+    <div className="auth-wrap">
+      <div className="auth-card">
+        <div className="auth-brand">
+          <div className="brand-name">NOTRE <span className="accent">UNIVERS</span></div>
+          <div className="brand-sub">Musical · connexion</div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div>
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Mot de passe</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          {errorMessage && <p className="auth-error">{errorMessage}</p>}
+
+          <button className="btn-ghost primary auth-btn" type="submit" disabled={isLoading}>
+            {isLoading ? 'Connexion...' : 'Se connecter'}
+          </button>
+        </form>
+
+        <Link to="/mot-de-passe-oublie" className="auth-link">
+          Mot de passe oublié ?
+        </Link>
+      </div>
     </div>
   )
 }
