@@ -10,11 +10,15 @@ import GroupesPage from './pages/GroupesPage.tsx'
 import WishlistPage from './pages/WishlistPage.tsx'
 import MerchPage from './pages/MerchPage.tsx'
 import ParametresPage from './pages/ParametresPage.tsx'
+import ResetPasswordPage from './pages/ResetPasswordPage.tsx'
+import ForgotPasswordPage from './pages/ForgotPasswordPage.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/mot-de-passe-oublie" element={<ForgotPasswordPage />} />
         <Route path="/" element={<App />}>
           <Route index element={<HomePage />} />
           <Route path="concerts" element={<ConcertsPage />} />
