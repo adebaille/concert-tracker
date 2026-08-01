@@ -1,4 +1,6 @@
-.account { position: relative; }
+.account {
+  position: relative;
+}
 
 .account-menu {
   position: absolute;
