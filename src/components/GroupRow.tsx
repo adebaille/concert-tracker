@@ -1,35 +1,57 @@
-import type { Groupe } from '../types'
+import type { Groupe } from "../types";
 
 type GroupRowProps = {
-  groupe: Groupe
-  index: number
-  onEdit: (groupe: Groupe) => void
-  onDelete: (groupe: Groupe) => void
-}
+  groupe: Groupe;
+  index: number;
+  onEdit: (groupe: Groupe) => void;
+  onDelete: (groupe: Groupe) => void;
+};
 
-const LOVE_EMOJI = { kpop: '💜', metal: '🔥' }
+const LOVE_EMOJI = { kpop: "💜", metal: "🔥" };
 
 function GroupRow({ groupe, index, onEdit, onDelete }: GroupRowProps) {
-  const variant = ['', '2', '3'][index % 3]
-  const coverClass = `${groupe.genre}${variant}`
+  const variant = ["", "2", "3"][index % 3];
+  const coverClass = `${groupe.genre}${variant}`;
 
   return (
     <div className="gr-row">
-      <div className="col-num">{String(index + 1).padStart(2, '0')}</div>
+      <div className="col-num">{String(index + 1).padStart(2, "0")}</div>
       <div className="col-name">
         <div className={`band-cover ${coverClass}`}>{groupe.coverInitials}</div>
         <div className="band-name-cell">
           <div className="name">{groupe.name}</div>
           <div className="country">{groupe.label}</div>
+          {groupe.concerts.length > 0 && (
+            <div className="gr-concerts">
+              {groupe.concerts.length > 0 && (
+                <div className="gr-concerts">
+                  {groupe.concerts.slice(0, 3).map((c) => (
+                    <span
+                      key={c.concertId}
+                      className={`gr-concert-tag ${c.status}`}>
+                      {c.concertName}
+                    </span>
+                  ))}
+                  {groupe.concerts.length > 3 && (
+                    <span className="gr-concert-tag more">
+                      +{groupe.concerts.length - 3}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <div>
         <span className={`genre-badge ${groupe.genre}`}>
-          {groupe.genre === 'kpop' ? 'Kpop' : 'Métal'}
+          {groupe.genre === "kpop" ? "Kpop" : "Métal"}
         </span>
       </div>
       <div className="col-style">{groupe.country}</div>
-      <div className="love">{LOVE_EMOJI[groupe.genre].repeat(groupe.loveLevel)}</div>
+      <div className="love">
+        {LOVE_EMOJI[groupe.genre].repeat(groupe.loveLevel)}
+      </div>
       <div>
         {groupe.seenEntries.some((entry) => entry.count > 0) ? (
           <div className="seen-detail">
@@ -37,7 +59,9 @@ function GroupRow({ groupe, index, onEdit, onDelete }: GroupRowProps) {
               .filter((entry) => entry.count > 0)
               .map((entry) => (
                 <span key={entry.userId} className="seen-person">
-                  <span className={`avatar ${entry.avatarStyle}`}>{entry.name[0]}</span>
+                  <span className={`avatar ${entry.avatarStyle}`}>
+                    {entry.name[0]}
+                  </span>
                   ×{entry.count}
                 </span>
               ))}
@@ -47,18 +71,24 @@ function GroupRow({ groupe, index, onEdit, onDelete }: GroupRowProps) {
         )}
       </div>
       <div className="col-added">
-        <div className={`avatar ${groupe.addedByGenre}`}>{groupe.addedByName[0]}</div>
+        <div className={`avatar ${groupe.addedByGenre}`}>
+          {groupe.addedByName[0]}
+        </div>
         <div>
           <div>{groupe.addedByName}</div>
           <div className="date">{groupe.addedDate}</div>
         </div>
       </div>
       <div className="row-actions">
-        <button title="Modifier" onClick={() => onEdit(groupe)}>✎</button>
-        <button title="Supprimer" onClick={() => onDelete(groupe)}>✕</button>
+        <button title="Modifier" onClick={() => onEdit(groupe)}>
+          ✎
+        </button>
+        <button title="Supprimer" onClick={() => onDelete(groupe)}>
+          ✕
+        </button>
       </div>
     </div>
-  )
+  );
 }
 
-export default GroupRow
+export default GroupRow;

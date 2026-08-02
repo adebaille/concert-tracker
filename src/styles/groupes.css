@@ -347,3 +347,27 @@
   border-width: 1px;
   flex-shrink: 0;
 }
+.gr-concerts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+}
+.gr-concert-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid var(--hair);
+  color: var(--text-muted);
+}
+.gr-concert-tag.prevu {
+  color: var(--kpop-soft);
+  border-color: rgba(176, 106, 255, 0.3);
+}
+.gr-concert-tag.more {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+}

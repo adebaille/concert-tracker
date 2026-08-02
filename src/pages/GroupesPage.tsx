@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { formatConcertDate } from '../lib/formatDate'
 import '../styles/groupes.css'
 import '../styles/form.css'
 import Topbar from '../components/TopBar'
 import GroupRow from '../components/GroupRow'
 import GroupeForm from '../components/GroupeForm'
-import type { Groupe, Profil, SeenEntry } from '../types'
+import type { Groupe, Profil, SeenEntry, GroupeConcert } from '../types'
 
 function GroupesPage() {
   const [groupes, setGroupes] = useState<Groupe[]>([])
@@ -17,14 +18,24 @@ function GroupesPage() {
   const [searchQuery, setSearchQuery] = useState('')
 
   async function loadGroupes() {
-    const [{ data: groupeRows }, { data: profilRows }, { data: vueRows }] = await Promise.all([
+    const [
+      { data: groupeRows },
+      { data: profilRows },
+      { data: vueRows },
+      { data: lineupRows },
+      { data: concertRows },
+    ] = await Promise.all([
       supabase.from('groupes').select('*'),
       supabase.from('profils').select('*'),
       supabase.from('groupe_vues').select('*'),
+      supabase.from('concert_lineup').select('*'),
+      supabase.from('concerts').select('id, name, event_date, status'),
     ])
 
     const profilsData = (profilRows ?? []) as Profil[]
     const vues = vueRows ?? []
+    const lineup = lineupRows ?? []
+    const concertsData = concertRows ?? []
     setProfils(profilsData)
 
     const formatted: Groupe[] = (groupeRows ?? []).map((row) => {
@@ -42,6 +53,19 @@ function GroupesPage() {
           }
         })
 
+      const groupeConcerts: GroupeConcert[] = lineup
+        .filter((l) => l.groupe_id === row.id)
+        .map((l) => {
+          const concert = concertsData.find((c) => c.id === l.concert_id)
+          return {
+            concertId: l.concert_id,
+            concertName: concert?.name ?? '?',
+            date: concert ? formatConcertDate(concert.event_date) : '',
+            status: concert?.status ?? 'passe',
+          }
+        })
+        .sort((a, b) => b.date.localeCompare(a.date))
+
       return {
         id: row.id,
         name: row.name,
@@ -54,6 +78,7 @@ function GroupesPage() {
         addedByGenre: profil?.avatar_style ?? 'kpop',
         addedDate: new Date(row.created_at).toLocaleDateString('fr-FR'),
         seenEntries,
+        concerts: groupeConcerts,
       }
     })
 
