@@ -1,12 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { toDateTimeLocalValue } from '../lib/formatDate'
-import type { Concert } from '../types'
+import type { Concert, GroupeOption } from '../types'
 
 type ConcertFormProps = {
   concert: Concert | null
   onClose: () => void
   onSaved: () => void
+}
+
+type LineupDraft = {
+  mode: 'suivi' | 'libre'
+  groupeId: string
+  groupeName: string
 }
 
 const EMPTY_FORM = {
@@ -45,11 +51,45 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
         }
       : EMPTY_FORM
   )
+
+  const [lineup, setLineup] = useState<LineupDraft[]>(
+    concert
+      ? concert.lineup.map((entry) => ({
+          mode: entry.isFollowed ? 'suivi' : 'libre',
+          groupeId: entry.groupeId !== null ? String(entry.groupeId) : '',
+          groupeName: entry.isFollowed ? '' : entry.groupeName,
+        }))
+      : []
+  )
+
+  const [groupeOptions, setGroupeOptions] = useState<GroupeOption[]>([])
   const [errorMessage, setErrorMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
 
+  useEffect(() => {
+    async function loadGroupes() {
+      const { data } = await supabase.from('groupes').select('id, name').order('name')
+      setGroupeOptions((data ?? []) as GroupeOption[])
+    }
+    loadGroupes()
+  }, [])
+
   function updateField(field: keyof typeof EMPTY_FORM, value: string | number | boolean) {
     setForm((previous) => ({ ...previous, [field]: value }))
+  }
+
+  function addLineupRow() {
+    setLineup((previous) => [...previous, { mode: 'suivi', groupeId: '', groupeName: '' }])
+  }
+
+  function removeLineupRow(index: number) {
+    setLineup((previous) => previous.filter((_, i) => i !== index))
+  }
+
+  function updateLineupRow(index: number, changes: Partial<LineupDraft>) {
+    setLineup((previous) =>
+      previous.map((row, i) => (i === index ? { ...row, ...changes } : row))
+    )
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -73,24 +113,39 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
       is_shared: form.isShared,
     }
 
-    let response
+    let concertId = concert?.id
 
     if (concert) {
-      response = await supabase.from('concerts').update(payload).eq('id', concert.id)
+      const { error } = await supabase.from('concerts').update(payload).eq('id', concert.id)
+      if (error) { setErrorMessage(error.message); setIsSaving(false); return }
     } else {
       const { data: userData } = await supabase.auth.getUser()
-      response = await supabase
+      const { data, error } = await supabase
         .from('concerts')
         .insert({ ...payload, added_by: userData.user?.id })
+        .select('id')
+        .single()
+      if (error) { setErrorMessage(error.message); setIsSaving(false); return }
+      concertId = data.id
+    }
+
+    // On remplace tout le lineup : on efface l'existant, on réinsère
+    await supabase.from('concert_lineup').delete().eq('concert_id', concertId)
+
+    const lineupRows = lineup
+      .filter((row) => (row.mode === 'suivi' ? row.groupeId !== '' : row.groupeName.trim() !== ''))
+      .map((row) => ({
+        concert_id: concertId,
+        groupe_id: row.mode === 'suivi' ? Number(row.groupeId) : null,
+        groupe_name: row.mode === 'libre' ? row.groupeName.trim() : null,
+      }))
+
+    if (lineupRows.length > 0) {
+      const { error: lineupError } = await supabase.from('concert_lineup').insert(lineupRows)
+      if (lineupError) { setErrorMessage(lineupError.message); setIsSaving(false); return }
     }
 
     setIsSaving(false)
-
-    if (response.error) {
-      setErrorMessage(response.error.message)
-      return
-    }
-
     onSaved()
     onClose()
   }
@@ -127,7 +182,6 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
               <select value={form.genre} onChange={(e) => updateField('genre', e.target.value)}>
                 <option value="kpop">Kpop</option>
                 <option value="metal">Métal</option>
-                <option value="fest">Festival</option>
               </select>
             </div>
           </div>
@@ -217,6 +271,47 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
             />
             On y va à deux
           </label>
+
+          <div className="field">
+            <label>Programmation</label>
+            {lineup.map((row, index) => (
+              <div key={index} className="lineup-row">
+                <select
+                  value={row.mode}
+                  onChange={(e) => updateLineupRow(index, { mode: e.target.value as 'suivi' | 'libre' })}
+                >
+                  <option value="suivi">Groupe suivi</option>
+                  <option value="libre">Nom libre</option>
+                </select>
+
+                {row.mode === 'suivi' ? (
+                  <select
+                    value={row.groupeId}
+                    onChange={(e) => updateLineupRow(index, { groupeId: e.target.value })}
+                  >
+                    <option value="">— choisir —</option>
+                    {groupeOptions.map((g) => (
+                      <option key={g.id} value={g.id}>{g.name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    placeholder="Nom du groupe"
+                    value={row.groupeName}
+                    onChange={(e) => updateLineupRow(index, { groupeName: e.target.value })}
+                  />
+                )}
+
+                <button type="button" className="lineup-remove" onClick={() => removeLineupRow(index)}>
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button type="button" className="btn-ghost lineup-add" onClick={addLineupRow}>
+              + Ajouter un groupe
+            </button>
+          </div>
 
           <div className="field">
             <label>Set list</label>
