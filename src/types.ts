@@ -26,6 +26,7 @@ export type Concert = {
   city: string
   rating: number
   participants: Participant[]
+  lineup: LineupEntry[]
   setlist?: string
   anecdote?: string
 }
@@ -85,4 +86,10 @@ export type MerchItem = {
   isShared: boolean
   anecdote: string
   participants: Participant[]
+}
+export type LineupEntry = {
+  id: number
+  groupeId: number | null
+  groupeName: string
+  isFollowed: boolean
 }

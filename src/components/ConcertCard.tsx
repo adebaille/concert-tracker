@@ -1,32 +1,38 @@
-import type { Concert } from '../types'
-import { participantsLabel } from '../lib/participants'
-import { buildConcertICS, downloadICS } from '../lib/calendar'
+import type { Concert } from "../types";
+import { participantsLabel } from "../lib/participants";
+import { buildConcertICS, downloadICS } from "../lib/calendar";
 
 type ConcertCardProps = {
-  concert: Concert
-  onEdit: (concert: Concert) => void
-  onDelete: (concert: Concert) => void
-}
+  concert: Concert;
+  onEdit: (concert: Concert) => void;
+  onDelete: (concert: Concert) => void;
+};
 
 const STATUS_LABELS = {
-  prevu: 'Prévu',
-  passe: 'Passé',
-  annule: 'Annulé',
-}
+  prevu: "Prévu",
+  passe: "Passé",
+  annule: "Annulé",
+};
 
 function ConcertCard({ concert, onEdit, onDelete }: ConcertCardProps) {
   function handleAddToCalendar() {
-    const content = buildConcertICS(concert)
-    downloadICS(`${concert.name}.ics`, content)
+    const content = buildConcertICS(concert);
+    downloadICS(`${concert.name}.ics`, content);
   }
   return (
     <article className="concert-card">
       <div className="card-actions">
-        {concert.status === 'prevu' && (
-          <button title="Ajouter à l'agenda" onClick={handleAddToCalendar}>📅</button>
+        {concert.status === "prevu" && (
+          <button title="Ajouter à l'agenda" onClick={handleAddToCalendar}>
+            📅
+          </button>
         )}
-        <button title="Modifier" onClick={() => onEdit(concert)}>✎</button>
-        <button title="Supprimer" onClick={() => onDelete(concert)}>✕</button>
+        <button title="Modifier" onClick={() => onEdit(concert)}>
+          ✎
+        </button>
+        <button title="Supprimer" onClick={() => onDelete(concert)}>
+          ✕
+        </button>
       </div>
       <div className={`cc-poster ${concert.genre}`}>
         <div className="placeholder-line">{concert.photoLabel}</div>
@@ -45,6 +51,18 @@ function ConcertCard({ concert, onEdit, onDelete }: ConcertCardProps) {
           {concert.venue} <span className="sep">·</span> {concert.city}
         </div>
 
+        {concert.lineup.length > 0 && (
+          <div className="cc-lineup">
+            {concert.lineup.map((entry) => (
+              <span
+                key={entry.id}
+                className={`lineup-tag ${entry.isFollowed ? "followed" : ""}`}>
+                {entry.groupeName}
+              </span>
+            ))}
+          </div>
+        )}
+
         {concert.setlist && (
           <div className="cc-bands">
             <strong>Set list :</strong> {concert.setlist}
@@ -58,20 +76,26 @@ function ConcertCard({ concert, onEdit, onDelete }: ConcertCardProps) {
           <div className="cc-foot-left">
             <div className="avatars">
               {concert.participants.map((p) => (
-                <div key={p.name} className={`avatar ${p.avatarStyle}`}>{p.name[0]}</div>
+                <div key={p.name} className={`avatar ${p.avatarStyle}`}>
+                  {p.name[0]}
+                </div>
               ))}
             </div>
-            <span className="label-mono">{participantsLabel(concert.participants)}</span>
+            <span className="label-mono">
+              {participantsLabel(concert.participants)}
+            </span>
           </div>
           <div className="stars">
             {[1, 2, 3, 4, 5].map((n) => (
-              <span key={n} className={n <= concert.rating ? 'on' : ''}>★</span>
+              <span key={n} className={n <= concert.rating ? "on" : ""}>
+                ★
+              </span>
             ))}
           </div>
         </div>
       </div>
     </article>
-  )
+  );
 }
 
-export default ConcertCard
+export default ConcertCard;

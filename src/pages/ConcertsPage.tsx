@@ -7,7 +7,7 @@ import '../styles/form.css'
 import Topbar from '../components/TopBar'
 import ConcertCard from '../components/ConcertCard'
 import ConcertForm from '../components/ConcertForm'
-import type { Concert, Profil } from '../types'
+import type { Concert, Profil, LineupEntry } from '../types'
 
 function ConcertsPage() {
   const [concerts, setConcerts] = useState<Concert[]>([])
@@ -19,33 +19,53 @@ function ConcertsPage() {
   const [viewMode, setViewMode] = useState<'grille' | 'liste'>('grille')
 
   async function loadConcerts() {
-    const [{ data: concertRows }, { data: profilRows }] = await Promise.all([
-      supabase.from('concerts').select('*'),
-      supabase.from('profils').select('*'),
-    ])
+    const [{ data: concertRows }, { data: profilRows }, { data: lineupRows }, { data: groupeRows }] =
+      await Promise.all([
+        supabase.from('concerts').select('*'),
+        supabase.from('profils').select('*'),
+        supabase.from('concert_lineup').select('*'),
+        supabase.from('groupes').select('id, name'),
+      ])
 
     const profils = (profilRows ?? []) as Profil[]
+    const lineup = lineupRows ?? []
+    const groupes = groupeRows ?? []
 
-    const formatted: Concert[] = (concertRows ?? []).map((row) => ({
-      id: row.id,
-      genre: row.genre,
-      status: row.status,
-      type: row.type,
-      eventDate: row.event_date,
-      hasTickets: row.has_tickets,
-      isShared: row.is_shared,
-      photoLabel: `Photo · ${row.name}`,
-      bigBg: row.name.toUpperCase(),
-      date: formatConcertDate(row.event_date),
-      price: row.price ?? 0,
-      name: row.name,
-      venue: row.venue,
-      city: row.city,
-      rating: row.rating ?? 0,
-      participants: resolveParticipants(profils, row.added_by, row.is_shared),
-      setlist: row.setlist ?? undefined,
-      anecdote: row.anecdote ?? undefined,
-    }))
+    const formatted: Concert[] = (concertRows ?? []).map((row) => {
+      const concertLineup: LineupEntry[] = lineup
+        .filter((l) => l.concert_id === row.id)
+        .map((l) => {
+          const groupe = groupes.find((g) => g.id === l.groupe_id)
+          return {
+            id: l.id,
+            groupeId: l.groupe_id,
+            groupeName: l.groupe_id !== null ? (groupe?.name ?? '?') : (l.groupe_name ?? ''),
+            isFollowed: l.groupe_id !== null,
+          }
+        })
+
+      return {
+        id: row.id,
+        genre: row.genre,
+        status: row.status,
+        type: row.type,
+        eventDate: row.event_date,
+        hasTickets: row.has_tickets,
+        isShared: row.is_shared,
+        photoLabel: `Photo · ${row.name}`,
+        bigBg: row.name.toUpperCase(),
+        date: formatConcertDate(row.event_date),
+        price: row.price ?? 0,
+        name: row.name,
+        venue: row.venue,
+        city: row.city,
+        rating: row.rating ?? 0,
+        participants: resolveParticipants(profils, row.added_by, row.is_shared),
+        lineup: concertLineup,
+        setlist: row.setlist ?? undefined,
+        anecdote: row.anecdote ?? undefined,
+      }
+    })
 
     setConcerts(formatted)
     setIsLoading(false)

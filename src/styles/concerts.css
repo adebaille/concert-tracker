@@ -292,3 +292,24 @@
     opacity: 1;
   }
 }
+.cc-lineup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+.lineup-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid var(--hair);
+  color: var(--text-muted);
+}
+.lineup-tag.followed {
+  color: var(--kpop-soft);
+  border-color: rgba(176, 106, 255, 0.3);
+  background: rgba(176, 106, 255, 0.08);
+}
