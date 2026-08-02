@@ -9,6 +9,20 @@ export type Participant = {
   avatarStyle: 'kpop' | 'metal'
 }
 
+export type LineupEntry = {
+  id: number
+  groupeId: number | null
+  groupeName: string
+  isFollowed: boolean
+}
+
+export type GroupeConcert = {
+  concertId: number
+  concertName: string
+  date: string
+  status: 'prevu' | 'passe' | 'annule'
+}
+
 export type Concert = {
   id: number
   genre: 'kpop' | 'metal'
@@ -50,6 +64,7 @@ export type Groupe = {
   addedByGenre: 'kpop' | 'metal'
   addedDate: string
   seenEntries: SeenEntry[]
+  concerts: GroupeConcert[]
 }
 
 export type Reve = {
@@ -74,7 +89,7 @@ export type GroupeOption = {
 export type MerchItem = {
   id: number
   previewStyle: 'tee' | 'hoodie' | 'poster' | 'cd' | 'photocard' | 'lightstick' | 'vinyl' | 'cap'
-  category: 'tshirt' | 'hoodie' | 'poster' | 'cd-album' | 'photocard' | 'lightstick' | 'casquette'
+  category: 'tshirt' | 'hoodie' | 'poster' | 'cd-album' | 'photocard' | 'lightstick' | 'bijou'
   bgText: string
   details: string
   name: string
@@ -86,10 +101,4 @@ export type MerchItem = {
   isShared: boolean
   anecdote: string
   participants: Participant[]
-}
-export type LineupEntry = {
-  id: number
-  groupeId: number | null
-  groupeName: string
-  isFollowed: boolean
 }
