@@ -81,6 +81,13 @@
   font-size: 14px;
   font-weight: 600;
 }
+.gr-name-link {
+  color: var(--text);
+  transition: color var(--t-fast) var(--ease);
+}
+.gr-name-link:hover {
+  color: var(--kpop-soft);
+}
 .band-name-cell .country {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -250,11 +257,9 @@
     background: transparent;
     border: none;
   }
-
   .gr-row.head {
     display: none;
   }
-
   .gr-row {
     display: flex;
     flex-direction: column;
@@ -266,16 +271,13 @@
     background: var(--bg-elev-1);
     margin-bottom: 12px;
   }
-
   .gr-row .col-num {
     display: none;
   }
-
   .gr-row .col-name {
     padding-bottom: 10px;
     border-bottom: 0.5px solid var(--hair);
   }
-
   .gr-row > div:not(.col-name):not(.row-actions) {
     display: flex;
     align-items: center;
@@ -288,8 +290,8 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-muted);
+    flex-shrink: 0;
   }
-
   .gr-row > div:nth-of-type(3)::before {
     content: "Genre";
   }
@@ -305,10 +307,34 @@
   .gr-row > div:nth-of-type(7)::before {
     content: "Ajouté par";
   }
-
   .gr-row .row-actions {
     opacity: 1;
     justify-content: flex-end;
+  }
+  /* Hype et Vu sont des cellules qui contiennent une colonne de personnes.
+     On force la cellule en ligne (label ⟷ contenu) et on garde le contenu empilé à droite. */
+  .gr-row > div.hype-detail,
+  .gr-row > div:nth-of-type(6) {
+    flex-direction: row;
+    align-items: center;
+  }
+  .gr-row > div.hype-detail {
+    justify-content: space-between;
+  }
+  .hype-detail .hype-person,
+  .seen-detail {
+    align-items: flex-end;
+  }
+  /* Stats : grille 2×2 au lieu du bandeau horizontal qui déborde */
+  .gr-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+  .gr-stat .sub {
+    display: none;
+  }
+  /* Sous-titre du haut masqué : redondant avec les cartes de stats */
+  .page-sub {
+    display: none;
   }
 }
 .seen-detail {
