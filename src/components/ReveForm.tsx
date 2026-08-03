@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import type { Reve } from '../types'
+import type { Reve, GroupeOption } from '../types'
 
 type ReveFormProps = {
   reve: Reve | null
@@ -16,6 +16,7 @@ const EMPTY_FORM = {
   dateValue: '',
   budget: '',
   note: '',
+  groupeId: '',
   isWatched: false,
   isShared: false,
 }
@@ -31,13 +32,23 @@ function ReveForm({ reve, onClose, onSaved }: ReveFormProps) {
           dateValue: reve.dateValue,
           budget: String(reve.budget),
           note: reve.note,
+          groupeId: reve.groupeId === null ? '' : String(reve.groupeId),
           isWatched: reve.isWatched,
           isShared: reve.isShared,
         }
       : EMPTY_FORM
   )
+  const [groupeOptions, setGroupeOptions] = useState<GroupeOption[]>([])
   const [errorMessage, setErrorMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+
+  useEffect(() => {
+    async function loadGroupes() {
+      const { data } = await supabase.from('groupes').select('id, name').order('name')
+      setGroupeOptions((data ?? []) as GroupeOption[])
+    }
+    loadGroupes()
+  }, [])
 
   function updateField(field: keyof typeof EMPTY_FORM, value: string | boolean) {
     setForm((previous) => ({ ...previous, [field]: value }))
@@ -56,6 +67,7 @@ function ReveForm({ reve, onClose, onSaved }: ReveFormProps) {
       date_value: form.dateValue || null,
       budget: form.budget === '' ? null : Number(form.budget),
       note: form.note || null,
+      groupe_id: form.groupeId === '' ? null : Number(form.groupeId),
       is_watched: form.isWatched,
       is_shared: form.isShared,
     }
@@ -110,6 +122,16 @@ function ReveForm({ reve, onClose, onSaved }: ReveFormProps) {
               value={form.subtitle}
               onChange={(e) => updateField('subtitle', e.target.value)}
             />
+          </div>
+
+          <div className="field">
+            <label>Groupe (optionnel)</label>
+            <select value={form.groupeId} onChange={(e) => updateField('groupeId', e.target.value)}>
+              <option value="">— aucun —</option>
+              {groupeOptions.map((g) => (
+                <option key={g.id} value={g.id}>{g.name}</option>
+              ))}
+            </select>
           </div>
 
           <div className="form-row">

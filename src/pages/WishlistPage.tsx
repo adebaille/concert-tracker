@@ -39,6 +39,7 @@ function WishlistPage() {
       dateValue: row.date_value ?? '',
       budget: row.budget ?? 0,
       note: row.note ?? '',
+      groupeId: row.groupe_id,
       isWatched: row.is_watched,
       isShared: row.is_shared,
       participants: resolveParticipants(profils, row.added_by, row.is_shared),

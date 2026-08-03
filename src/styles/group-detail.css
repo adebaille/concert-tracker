@@ -1,0 +1,343 @@
+.gd-back {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.gd-back:hover {
+  color: var(--text);
+}
+
+.gd-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+.gd-header .band-cover {
+  width: 88px;
+  height: 88px;
+  border-radius: 16px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 30px;
+  color: rgba(255, 255, 255, 0.9);
+}
+.gd-name {
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  margin-bottom: 10px;
+}
+.gd-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.gd-notfound {
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.gd-section {
+  margin-bottom: 36px;
+}
+.gd-section-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.gd-membres {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.gd-membre-card {
+  background: var(--bg-elev-1);
+  border: 0.5px solid var(--hair);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.gd-membre-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.gd-membre-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+.gd-membre-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.gd-membre-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.gd-membre-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+}
+.hype-icons {
+  display: flex;
+  gap: 2px;
+}
+.hype-icons .hype-on {
+  color: var(--kpop);
+  fill: var(--kpop);
+}
+.hype-icons .hype-off {
+  color: var(--hair-strong);
+}
+
+.gd-concert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.gd-concert-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: var(--bg-elev-1);
+  border: 0.5px solid var(--hair);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  transition: border-color var(--t-fast) var(--ease);
+}
+.gd-concert-item:hover {
+  border-color: var(--hair-strong);
+}
+.gd-concert-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.gd-concert-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+.gd-concert-place {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.gd-concert-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.gd-concert-date {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+}
+.gd-concert-status {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+}
+.gd-concert-status.prevu {
+  color: var(--kpop-soft);
+  background: rgba(176, 106, 255, 0.1);
+}
+
+.gd-merch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.gd-merch-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: var(--bg-elev-1);
+  border: 0.5px solid var(--hair);
+  border-radius: var(--r-md);
+  padding: 13px 16px;
+  transition: border-color var(--t-fast) var(--ease);
+}
+.gd-merch-item:hover {
+  border-color: var(--hair-strong);
+}
+.gd-merch-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+.gd-merch-side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.gd-merch-note {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.gd-merch-price {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.gd-reve-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.gd-reve-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-elev-1);
+  border: 0.5px solid var(--hair);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  border-left: 2px solid var(--hair);
+  transition: border-color var(--t-fast) var(--ease);
+}
+.gd-reve-item.ultime {
+  border-left-color: var(--kpop);
+}
+.gd-reve-item.haute {
+  border-left-color: var(--metal);
+}
+.gd-reve-item:hover {
+  border-color: var(--hair-strong);
+}
+.gd-reve-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+.gd-reve-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.gd-reve-priority {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.gd-reve-priority.ultime {
+  color: var(--kpop-soft);
+}
+
+.gd-empty {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+    .gd-reve-list {
+    grid-template-columns: 1fr;
+  }
+  .gd-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .gd-name {
+    font-size: 30px;
+  }
+  .gd-membres {
+    grid-template-columns: 1fr;
+  }
+  .gd-concert-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .gd-concert-side {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 10px;
+  }
+  .gd-reve-list {
+    grid-template-columns: 1fr;
+  }
+}
+.gd-reve-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.gd-reve-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-elev-1);
+  border: 0.5px solid var(--hair);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  border-left: 2px solid var(--hair);
+  transition: border-color var(--t-fast) var(--ease);
+}
+.gd-reve-item.ultime {
+  border-left-color: var(--kpop);
+}
+.gd-reve-item.haute {
+  border-left-color: var(--metal);
+}
+.gd-reve-item:hover {
+  border-color: var(--hair-strong);
+}
+.gd-reve-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+.gd-reve-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.gd-reve-priority {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.gd-reve-priority.ultime {
+  color: var(--kpop-soft);
+}
