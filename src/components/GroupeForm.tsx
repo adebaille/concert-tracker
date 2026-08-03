@@ -14,7 +14,6 @@ const EMPTY_FORM = {
   label: '',
   genre: 'kpop',
   country: '',
-  loveLevel: 3,
 }
 
 function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
@@ -25,12 +24,11 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
           label: groupe.label,
           genre: groupe.genre,
           country: groupe.country,
-          loveLevel: groupe.loveLevel,
         }
       : EMPTY_FORM
   )
 
-  // Un compteur par profil, indexé par user_id : { "uuid-alison": 3, "uuid-emeline": 1 }
+  // Un compteur de vues ET un niveau de hype par profil, indexés par user_id
   const [seenCounts, setSeenCounts] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {}
     for (const profil of profils) {
@@ -40,15 +38,28 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
     return initial
   })
 
+  const [hypeLevels, setHypeLevels] = useState<Record<string, number>>(() => {
+    const initial: Record<string, number> = {}
+    for (const profil of profils) {
+      const existing = groupe?.seenEntries.find((e) => e.userId === profil.id)
+      initial[profil.id] = existing ? existing.hype : 0
+    }
+    return initial
+  })
+
   const [errorMessage, setErrorMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
 
-  function updateField(field: keyof typeof EMPTY_FORM, value: string | number) {
+  function updateField(field: keyof typeof EMPTY_FORM, value: string) {
     setForm((previous) => ({ ...previous, [field]: value }))
   }
 
   function updateSeenCount(userId: string, value: number) {
     setSeenCounts((previous) => ({ ...previous, [userId]: value }))
+  }
+
+  function updateHype(userId: string, value: number) {
+    setHypeLevels((previous) => ({ ...previous, [userId]: value }))
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -62,7 +73,6 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
       genre: form.genre,
       country: form.country,
       cover_initials: form.name.slice(0, 2).toUpperCase(),
-      love_level: form.loveLevel,
     }
 
     let groupeId = groupe?.id
@@ -81,21 +91,22 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
       groupeId = data.id
     }
 
-    // Enregistrer les vues : une ligne par personne, dans groupe_vues
+    // Une ligne par personne dans groupe_membres : vues + hype
     const rows = profils.map((profil) => ({
       groupe_id: groupeId,
       user_id: profil.id,
       seen_count: seenCounts[profil.id] ?? 0,
+      hype_level: hypeLevels[profil.id] ?? 0,
     }))
 
-    const { error: seenError } = await supabase
-      .from('groupe_vues')
+    const { error: membreError } = await supabase
+      .from('groupe_membres')
       .upsert(rows, { onConflict: 'groupe_id,user_id' })
 
     setIsSaving(false)
 
-    if (seenError) {
-      setErrorMessage(seenError.message)
+    if (membreError) {
+      setErrorMessage(membreError.message)
       return
     }
 
@@ -153,28 +164,26 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
           </div>
 
           <div className="field">
-            <label>Niveau d'amour (0 à 5)</label>
-            <select
-              value={form.loveLevel}
-              onChange={(e) => updateField('loveLevel', Number(e.target.value))}
-            >
-              {[0, 1, 2, 3, 4, 5].map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="field">
-            <label>Vu en concert — nombre de fois par personne</label>
+            <label>Par personne — hype et concerts vus</label>
             {profils.map((profil) => (
-              <div key={profil.id} className="seen-input-row">
+              <div key={profil.id} className="membre-row">
                 <span className={`avatar ${profil.avatar_style}`}>{profil.display_name[0]}</span>
-                <span className="seen-input-name">{profil.display_name}</span>
+                <span className="membre-name">{profil.display_name}</span>
+                <select
+                  value={hypeLevels[profil.id] ?? 0}
+                  onChange={(e) => updateHype(profil.id, Number(e.target.value))}
+                  title="Niveau de hype"
+                >
+                  {[0, 1, 2, 3, 4, 5].map((n) => (
+                    <option key={n} value={n}>{n} {form.genre === 'kpop' ? '💜' : '🔥'}</option>
+                  ))}
+                </select>
                 <input
                   type="number"
                   min="0"
                   value={seenCounts[profil.id] ?? 0}
                   onChange={(e) => updateSeenCount(profil.id, Number(e.target.value))}
+                  title="Nombre de fois vu"
                 />
               </div>
             ))}

@@ -50,6 +50,7 @@ export type SeenEntry = {
   name: string
   avatarStyle: 'kpop' | 'metal'
   count: number
+  hype: number
 }
 
 export type Groupe = {
@@ -59,7 +60,6 @@ export type Groupe = {
   genre: 'kpop' | 'metal'
   country: string
   coverInitials: string
-  loveLevel: number
   addedByName: string
   addedByGenre: 'kpop' | 'metal'
   addedDate: string

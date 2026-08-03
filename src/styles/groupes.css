@@ -94,14 +94,6 @@
   color: var(--text-muted);
 }
 
-.love {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-size: 14px;
-  letter-spacing: -2px;
-}
-
 .seen-yes,
 .seen-no {
   display: inline-flex;
@@ -275,18 +267,15 @@
     margin-bottom: 12px;
   }
 
-  /* Le numéro de rang n'a plus de sens en cartes */
   .gr-row .col-num {
     display: none;
   }
 
-  /* Nom + pochette : en tête de carte, mis en valeur */
   .gr-row .col-name {
     padding-bottom: 10px;
     border-bottom: 0.5px solid var(--hair);
   }
 
-  /* Chaque info : libellé à gauche (généré en CSS), valeur à droite */
   .gr-row > div:not(.col-name):not(.row-actions) {
     display: flex;
     align-items: center;
@@ -301,7 +290,6 @@
     color: var(--text-muted);
   }
 
-  /* On nomme chaque info dans son ordre d'apparition */
   .gr-row > div:nth-of-type(3)::before {
     content: "Genre";
   }
@@ -309,7 +297,7 @@
     content: "Pays";
   }
   .gr-row > div:nth-of-type(5)::before {
-    content: "Amour";
+    content: "Hype";
   }
   .gr-row > div:nth-of-type(6)::before {
     content: "Vu";
@@ -318,7 +306,6 @@
     content: "Ajouté par";
   }
 
-  /* Actions : visibles sans survol, alignées à droite */
   .gr-row .row-actions {
     opacity: 1;
     justify-content: flex-end;
@@ -370,4 +357,33 @@
 .gr-concert-tag.more {
   color: var(--text);
   background: rgba(255, 255, 255, 0.08);
+}
+.hype-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hype-person {
+  display: grid;
+  grid-template-columns: 18px auto;
+  align-items: center;
+  gap: 10px;
+}
+.hype-person .avatar {
+  width: 16px;
+  height: 16px;
+  font-size: 8px;
+  border-width: 1px;
+  flex-shrink: 0;
+}
+.hype-icons {
+  display: flex;
+  gap: 2px;
+}
+.hype-icons .hype-on {
+  color: var(--kpop);
+  fill: var(--kpop);
+}
+.hype-icons .hype-off {
+  color: var(--hair-strong);
 }
