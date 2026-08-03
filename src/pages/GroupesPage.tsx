@@ -21,19 +21,19 @@ function GroupesPage() {
     const [
       { data: groupeRows },
       { data: profilRows },
-      { data: vueRows },
+      { data: membreRows },
       { data: lineupRows },
       { data: concertRows },
     ] = await Promise.all([
       supabase.from('groupes').select('*'),
       supabase.from('profils').select('*'),
-      supabase.from('groupe_vues').select('*'),
+      supabase.from('groupe_membres').select('*'),
       supabase.from('concert_lineup').select('*'),
       supabase.from('concerts').select('id, name, event_date, status'),
     ])
 
     const profilsData = (profilRows ?? []) as Profil[]
-    const vues = vueRows ?? []
+    const membres = membreRows ?? []
     const lineup = lineupRows ?? []
     const concertsData = concertRows ?? []
     setProfils(profilsData)
@@ -41,7 +41,7 @@ function GroupesPage() {
     const formatted: Groupe[] = (groupeRows ?? []).map((row) => {
       const profil = profilsData.find((p) => p.id === row.added_by)
 
-      const seenEntries: SeenEntry[] = vues
+      const seenEntries: SeenEntry[] = membres
         .filter((v) => v.groupe_id === row.id)
         .map((v) => {
           const p = profilsData.find((profil) => profil.id === v.user_id)
@@ -50,6 +50,7 @@ function GroupesPage() {
             name: p?.display_name ?? '?',
             avatarStyle: p?.avatar_style ?? 'kpop',
             count: v.seen_count,
+            hype: v.hype_level,
           }
         })
 
@@ -73,7 +74,6 @@ function GroupesPage() {
         genre: row.genre,
         country: row.country,
         coverInitials: row.cover_initials,
-        loveLevel: row.love_level,
         addedByName: profil?.display_name ?? '?',
         addedByGenre: profil?.avatar_style ?? 'kpop',
         addedDate: new Date(row.created_at).toLocaleDateString('fr-FR'),
@@ -208,7 +208,7 @@ function GroupesPage() {
           <div>Groupe</div>
           <div>Genre</div>
           <div>Pays</div>
-          <div>Niveau d'amour</div>
+          <div>Hype</div>
           <div>Vu</div>
           <div>Ajouté par</div>
           <div></div>
