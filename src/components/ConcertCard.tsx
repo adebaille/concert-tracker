@@ -4,6 +4,7 @@ import { buildConcertICS, downloadICS } from "../lib/calendar";
 
 type ConcertCardProps = {
   concert: Concert;
+  isFocused?: boolean;
   onEdit: (concert: Concert) => void;
   onDelete: (concert: Concert) => void;
 };
@@ -14,13 +15,16 @@ const STATUS_LABELS = {
   annule: "Annulé",
 };
 
-function ConcertCard({ concert, onEdit, onDelete }: ConcertCardProps) {
+function ConcertCard({ concert, isFocused, onEdit, onDelete }: ConcertCardProps) {
   function handleAddToCalendar() {
     const content = buildConcertICS(concert);
     downloadICS(`${concert.name}.ics`, content);
   }
   return (
-    <article className="concert-card">
+    <article
+      id={`concert-${concert.id}`}
+      className={`concert-card ${isFocused ? "is-focused" : ""}`}
+    >
       <div className="card-actions">
         {concert.status === "prevu" && (
           <button title="Ajouter à l'agenda" onClick={handleAddToCalendar}>

@@ -341,3 +341,9 @@
 .gd-reve-priority.ultime {
   color: var(--kpop-soft);
 }
+.gd-merch-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}

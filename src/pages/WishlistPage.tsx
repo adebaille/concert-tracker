@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router'
 import { supabase } from '../lib/supabaseClient'
 import { resolveParticipants } from '../lib/participants'
 import '../styles/wishlist.css'
@@ -21,6 +22,9 @@ function WishlistPage() {
   const [editingReve, setEditingReve] = useState<Reve | null>(null)
   const [activeFilter, setActiveFilter] = useState<'toutes' | 'ultime' | 'haute' | 'moyenne'>('toutes')
   const [searchQuery, setSearchQuery] = useState('')
+
+  const [searchParams] = useSearchParams()
+  const focusId = searchParams.get('focus')
 
   async function loadReves() {
     const [{ data: reveRows }, { data: profilRows }] = await Promise.all([
@@ -53,6 +57,22 @@ function WishlistPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- setState après await, donc pas synchrone
     loadReves()
   }, [])
+
+  useEffect(() => {
+    if (!focusId) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- réinitialiser les filtres quand un focus arrive est volontaire
+    setActiveFilter('toutes')
+    setSearchQuery('')
+  }, [focusId])
+
+  useEffect(() => {
+    if (isLoading || !focusId) return
+
+    const element = document.getElementById(`reve-${focusId}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [isLoading, focusId])
 
   function openCreateForm() {
     setEditingReve(null)
@@ -193,6 +213,7 @@ function WishlistPage() {
                 <DreamCard
                   key={reve.id}
                   reve={reve}
+                  isFocused={String(reve.id) === focusId}
                   onEdit={openEditForm}
                   onDelete={handleDelete}
                 />

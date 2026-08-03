@@ -3,11 +3,12 @@ import { participantsLabel } from '../lib/participants'
 
 type DreamCardProps = {
   reve: Reve
+  isFocused?: boolean
   onEdit: (reve: Reve) => void
   onDelete: (reve: Reve) => void
 }
 
-function DreamCard({ reve, onEdit, onDelete }: DreamCardProps) {
+function DreamCard({ reve, isFocused, onEdit, onDelete }: DreamCardProps) {
   const dateLabel = reve.priority === 'ultime' ? 'Date estimée' : 'Date possible'
   const budgetLabel = reve.priority === 'ultime' ? 'Budget rêvé' : 'Budget'
 
@@ -16,7 +17,7 @@ function DreamCard({ reve, onEdit, onDelete }: DreamCardProps) {
     : participantsLabel(reve.participants)
 
   return (
-    <article className={`wl-card ${reve.priority}`}>
+    <article id={`reve-${reve.id}`} className={`wl-card ${reve.priority} ${isFocused ? 'is-focused' : ''}`}>
       <div className="wl-card-head">
         <div className="band">
           <span className={`badge-genre ${reve.genre}`}>

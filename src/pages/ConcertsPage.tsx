@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router'
 import { supabase } from '../lib/supabaseClient'
 import { formatConcertDate } from '../lib/formatDate'
 import { resolveParticipants } from '../lib/participants'
@@ -17,6 +18,9 @@ function ConcertsPage() {
   const [activeFilter, setActiveFilter] = useState<'tous' | 'a-venir' | 'passes'>('tous')
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'grille' | 'liste'>('grille')
+
+  const [searchParams] = useSearchParams()
+  const focusId = searchParams.get('focus')
 
   async function loadConcerts() {
     const [{ data: concertRows }, { data: profilRows }, { data: lineupRows }, { data: groupeRows }] =
@@ -75,6 +79,16 @@ function ConcertsPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- setState après await, donc pas synchrone
     loadConcerts()
   }, [])
+
+  // Une fois les concerts affichés, si un focus est demandé, on y défile
+  useEffect(() => {
+    if (isLoading || !focusId) return
+
+    const element = document.getElementById(`concert-${focusId}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [isLoading, focusId])
 
   function openCreateForm() {
     setEditingConcert(null)
@@ -197,6 +211,7 @@ function ConcertsPage() {
           <ConcertCard
             key={concert.id}
             concert={concert}
+            isFocused={String(concert.id) === focusId}
             onEdit={openEditForm}
             onDelete={handleDelete}
           />

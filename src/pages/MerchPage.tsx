@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router'
 import { Shirt, Layers, ScrollText, Disc3, Image, Sparkles, Gem, Globe } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
 import { resolveParticipants } from '../lib/participants'
@@ -30,6 +31,9 @@ function MerchPage() {
   const [ownerFilter, setOwnerFilter] = useState<string>('tout')
   const [categoryFilter, setCategoryFilter] = useState<string>('toutes')
   const [searchQuery, setSearchQuery] = useState('')
+
+  const [searchParams] = useSearchParams()
+  const focusId = searchParams.get('focus')
 
   async function loadMerch() {
     const [{ data: merchRows }, { data: profilRows }, { data: groupeRows }, { data: userData }] =
@@ -76,6 +80,25 @@ function MerchPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- setState après await, donc pas synchrone
     loadMerch()
   }, [])
+
+  // Si un focus est demandé, on remet les filtres à zéro (pour que la carte soit visible)
+  useEffect(() => {
+    if (!focusId) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- réinitialiser les filtres quand un focus arrive est volontaire
+    setOwnerFilter('tout')
+    setCategoryFilter('toutes')
+    setSearchQuery('')
+  }, [focusId])
+
+  // Une fois affiché et filtres remis à zéro, on défile jusqu'à la carte
+  useEffect(() => {
+    if (isLoading || !focusId) return
+
+    const element = document.getElementById(`merch-${focusId}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [isLoading, focusId])
 
   function openCreateForm() {
     setEditingItem(null)
@@ -251,6 +274,7 @@ function MerchPage() {
           <MerchItemCard
             key={item.id}
             item={item}
+            isFocused={String(item.id) === focusId}
             onEdit={openEditForm}
             onDelete={handleDelete}
           />
