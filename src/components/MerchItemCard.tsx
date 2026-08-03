@@ -4,6 +4,7 @@ import { participantsLabel } from '../lib/participants'
 
 type MerchItemCardProps = {
   item: MerchItemData
+  isFocused?: boolean
   onEdit: (item: MerchItemData) => void
   onDelete: (item: MerchItemData) => void
 }
@@ -19,11 +20,11 @@ const PREVIEW_ICON = {
   cap: Gem,
 }
 
-function MerchItemCard({ item, onEdit, onDelete }: MerchItemCardProps) {
+function MerchItemCard({ item, isFocused, onEdit, onDelete }: MerchItemCardProps) {
   const Icon = PREVIEW_ICON[item.previewStyle]
 
   return (
-    <article className="mr-item">
+    <article id={`merch-${item.id}`} className={`mr-item ${isFocused ? 'is-focused' : ''}`}>
       <div className="mr-actions">
         <button title="Modifier" onClick={() => onEdit(item)}>✎</button>
         <button title="Supprimer" onClick={() => onDelete(item)}>✕</button>

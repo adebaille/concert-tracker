@@ -268,3 +268,14 @@
     opacity: 1;
   }
 }
+.wl-card.is-focused {
+  animation: focus-pulse 2s ease-out;
+}
+@keyframes focus-pulse {
+  0% {
+    box-shadow: 0 0 0 2px var(--kpop), 0 0 24px rgba(176, 106, 255, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent, 0 0 0 transparent;
+  }
+}

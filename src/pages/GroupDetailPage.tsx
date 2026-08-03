@@ -236,7 +236,7 @@ function GroupDetailPage() {
         {groupe.concerts.length > 0 ? (
           <div className="gd-concert-list">
             {groupe.concerts.map((c) => (
-              <Link key={c.concertId} to="/concerts" className={`gd-concert-item ${c.status}`}>
+              <Link key={c.concertId} to={`/concerts?focus=${c.concertId}`} className={`gd-concert-item ${c.status}`}>
                 <div className="gd-concert-main">
                   <span className="gd-concert-name">{c.concertName}</span>
                   <span className="gd-concert-place">{c.venue} · {c.city}</span>
@@ -262,7 +262,7 @@ function GroupDetailPage() {
         {groupe.merch.length > 0 ? (
           <div className="gd-merch-list">
             {groupe.merch.map((m) => (
-              <Link key={m.id} to="/merch" className="gd-merch-item">
+              <Link key={m.id} to={`/merch?focus=${m.id}`} className="gd-merch-item">
                 <div className="gd-merch-main">
                   <span className="gd-merch-name">{m.name}</span>
                   {m.bandNote && <span className="gd-merch-note">{m.bandNote}</span>}
@@ -293,7 +293,7 @@ function GroupDetailPage() {
         {groupe.reves.length > 0 ? (
           <div className="gd-reve-list">
             {groupe.reves.map((r) => (
-              <Link key={r.id} to="/wishlist" className={`gd-reve-item ${r.priority}`}>
+              <Link key={r.id} to={`/wishlist?focus=${r.id}`} className={`gd-reve-item ${r.priority}`}>
                 <span className="gd-reve-title">{r.title}</span>
                 {r.subtitle && <span className="gd-reve-subtitle">{r.subtitle}</span>}
                 <span className={`gd-reve-priority ${r.priority}`}>
