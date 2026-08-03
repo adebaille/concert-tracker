@@ -76,6 +76,7 @@ export type Reve = {
   dateValue: string
   budget: number
   note: string
+  groupeId: number | null
   isWatched: boolean
   isShared: boolean
   participants: Participant[]

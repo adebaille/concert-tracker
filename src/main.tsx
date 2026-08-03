@@ -7,6 +7,7 @@ import App from './App.tsx'
 import HomePage from './pages/HomePage.tsx'
 import ConcertsPage from './pages/ConcertsPage.tsx'
 import GroupesPage from './pages/GroupesPage.tsx'
+import GroupDetailPage from './pages/GroupDetailPage.tsx'
 import WishlistPage from './pages/WishlistPage.tsx'
 import MerchPage from './pages/MerchPage.tsx'
 import ParametresPage from './pages/ParametresPage.tsx'
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
           <Route index element={<HomePage />} />
           <Route path="concerts" element={<ConcertsPage />} />
           <Route path="groupes" element={<GroupesPage />} />
+          <Route path="groupes/:id" element={<GroupDetailPage />} />
           <Route path="wishlist" element={<WishlistPage />} />
           <Route path="merch" element={<MerchPage />} />
           <Route path="parametres" element={<ParametresPage />} />

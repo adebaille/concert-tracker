@@ -1,4 +1,5 @@
 import { Heart, Flame } from 'lucide-react'
+import { Link } from 'react-router'
 import type { Groupe } from '../types'
 
 type GroupRowProps = {
@@ -19,7 +20,9 @@ function GroupRow({ groupe, index, onEdit, onDelete }: GroupRowProps) {
       <div className="col-name">
         <div className={`band-cover ${coverClass}`}>{groupe.coverInitials}</div>
         <div className="band-name-cell">
-          <div className="name">{groupe.name}</div>
+          <Link to={`/groupes/${groupe.id}`} className="name gr-name-link">
+            {groupe.name}
+          </Link>
           <div className="country">{groupe.label}</div>
           {groupe.concerts.length > 0 && (
             <div className="gr-concerts">
