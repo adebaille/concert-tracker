@@ -28,7 +28,9 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
       : EMPTY_FORM
   )
 
-  // Un compteur de vues ET un niveau de hype par profil, indexés par user_id
+  const [photoUrl, setPhotoUrl] = useState(groupe?.photoUrl ?? '')
+  const [isUploading, setIsUploading] = useState(false)
+
   const [seenCounts, setSeenCounts] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {}
     for (const profil of profils) {
@@ -62,6 +64,34 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
     setHypeLevels((previous) => ({ ...previous, [userId]: value }))
   }
 
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+    setErrorMessage('')
+
+    // Nom de fichier unique : l'horodatage évite d'écraser une autre image
+    const fileExtension = file.name.split('.').pop()
+    const fileName = `${Date.now()}.${fileExtension}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('groupes')
+      .upload(fileName, file)
+
+    if (uploadError) {
+      setErrorMessage('Upload impossible : ' + uploadError.message)
+      setIsUploading(false)
+      return
+    }
+
+    // Récupérer l'URL publique du fichier qu'on vient d'envoyer
+    const { data } = supabase.storage.from('groupes').getPublicUrl(fileName)
+
+    setPhotoUrl(data.publicUrl)
+    setIsUploading(false)
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setErrorMessage('')
@@ -73,6 +103,7 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
       genre: form.genre,
       country: form.country,
       cover_initials: form.name.slice(0, 2).toUpperCase(),
+      photo_url: photoUrl || null,
     }
 
     let groupeId = groupe?.id
@@ -91,7 +122,6 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
       groupeId = data.id
     }
 
-    // Une ligne par personne dans groupe_membres : vues + hype
     const rows = profils.map((profil) => ({
       groupe_id: groupeId,
       user_id: profil.id,
@@ -131,6 +161,29 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
               onChange={(e) => updateField('name', e.target.value)}
               required
             />
+          </div>
+
+          <div className="field">
+            <label>Photo du groupe</label>
+            <div className="photo-upload">
+              <div className="photo-preview">
+                {photoUrl ? (
+                  <img src={photoUrl} alt="Aperçu" />
+                ) : (
+                  <span className="photo-placeholder">{form.name || 'Aperçu'}</span>
+                )}
+              </div>
+              <label className="btn-ghost photo-btn">
+                {isUploading ? 'Envoi...' : 'Choisir une image'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                  hidden
+                />
+              </label>
+            </div>
           </div>
 
           <div className="field">
@@ -193,7 +246,7 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
 
           <div className="form-actions">
             <button type="button" className="btn-ghost" onClick={onClose}>Annuler</button>
-            <button type="submit" className="btn-ghost primary" disabled={isSaving}>
+            <button type="submit" className="btn-ghost primary" disabled={isSaving || isUploading}>
               {isSaving ? 'Enregistrement...' : groupe ? 'Enregistrer' : 'Ajouter'}
             </button>
           </div>
