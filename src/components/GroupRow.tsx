@@ -18,7 +18,13 @@ function GroupRow({ groupe, index, onEdit, onDelete }: GroupRowProps) {
     <div className="gr-row">
       <div className="col-num">{String(index + 1).padStart(2, '0')}</div>
       <div className="col-name">
-        <div className={`band-cover ${coverClass}`}>{groupe.coverInitials}</div>
+        <div className={`band-cover ${coverClass}`}>
+          {groupe.photoUrl ? (
+            <img src={groupe.photoUrl} alt={groupe.name} className="band-cover-img" />
+          ) : (
+            <span className="band-cover-fallback">{groupe.name}</span>
+          )}
+        </div>
         <div className="band-name-cell">
           <Link to={`/groupes/${groupe.id}`} className="name gr-name-link">
             {groupe.name}

@@ -48,6 +48,7 @@ type GroupeDetail = {
   genre: 'kpop' | 'metal'
   country: string
   coverInitials: string
+  photoUrl: string | null
   membres: MembreEntry[]
   concerts: GroupeConcert[]
   merch: GroupeMerch[]
@@ -141,6 +142,7 @@ function GroupDetailPage() {
         genre: groupeData.genre,
         country: groupeData.country,
         coverInitials: groupeData.cover_initials,
+        photoUrl: groupeData.photo_url,
         membres,
         concerts,
         merch,
@@ -182,7 +184,13 @@ function GroupDetailPage() {
       <Link to="/groupes" className="gd-back">← Tous les groupes</Link>
 
       <header className="gd-header">
-        <div className={`band-cover ${groupe.genre}`}>{groupe.coverInitials}</div>
+        <div className={`band-cover ${groupe.genre}`}>
+          {groupe.photoUrl ? (
+            <img src={groupe.photoUrl} alt={groupe.name} className="band-cover-img" />
+          ) : (
+            <span className="band-cover-fallback">{groupe.name}</span>
+          )}
+        </div>
         <div className="gd-header-info">
           <h1 className="gd-name">{groupe.name}</h1>
           <div className="gd-meta">

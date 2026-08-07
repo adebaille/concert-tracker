@@ -74,6 +74,7 @@ function GroupesPage() {
         genre: row.genre,
         country: row.country,
         coverInitials: row.cover_initials,
+        photoUrl: row.photo_url,
         addedByName: profil?.display_name ?? '?',
         addedByGenre: profil?.avatar_style ?? 'kpop',
         addedDate: new Date(row.created_at).toLocaleDateString('fr-FR'),

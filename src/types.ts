@@ -65,6 +65,7 @@ export type Groupe = {
   addedDate: string
   seenEntries: SeenEntry[]
   concerts: GroupeConcert[]
+  photoUrl: string | null
 }
 
 export type Reve = {
