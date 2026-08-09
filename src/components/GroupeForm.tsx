@@ -16,6 +16,13 @@ const EMPTY_FORM = {
   country: '',
 }
 
+// Extrait le nom de fichier depuis une URL publique Supabase
+// (l'URL finit par .../groupes/123456.jpg → on veut "123456.jpg")
+function fileNameFromPublicUrl(url: string): string | null {
+  const parts = url.split('/groupes/')
+  return parts.length === 2 ? parts[1] : null
+}
+
 function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
   const [form, setForm] = useState(
     groupe
@@ -71,7 +78,14 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
     setIsUploading(true)
     setErrorMessage('')
 
-    // Nom de fichier unique : l'horodatage évite d'écraser une autre image
+    // Remplacement propre : on supprime l'ancienne image d'abord, s'il y en a une
+    if (photoUrl) {
+      const oldName = fileNameFromPublicUrl(photoUrl)
+      if (oldName) {
+        await supabase.storage.from('groupes').remove([oldName])
+      }
+    }
+
     const fileExtension = file.name.split('.').pop()
     const fileName = `${Date.now()}.${fileExtension}`
 
@@ -85,11 +99,20 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
       return
     }
 
-    // Récupérer l'URL publique du fichier qu'on vient d'envoyer
     const { data } = supabase.storage.from('groupes').getPublicUrl(fileName)
 
     setPhotoUrl(data.publicUrl)
     setIsUploading(false)
+  }
+
+  async function handleRemovePhoto() {
+    if (!photoUrl) return
+
+    const oldName = fileNameFromPublicUrl(photoUrl)
+    if (oldName) {
+      await supabase.storage.from('groupes').remove([oldName])
+    }
+    setPhotoUrl('')
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -173,16 +196,28 @@ function GroupeForm({ groupe, profils, onClose, onSaved }: GroupeFormProps) {
                   <span className="photo-placeholder">{form.name || 'Aperçu'}</span>
                 )}
               </div>
-              <label className="btn-ghost photo-btn">
-                {isUploading ? 'Envoi...' : 'Choisir une image'}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  disabled={isUploading}
-                  hidden
-                />
-              </label>
+              <div className="photo-buttons">
+                <label className="btn-ghost photo-btn">
+                  {isUploading ? 'Envoi...' : photoUrl ? 'Changer' : 'Choisir une image'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    disabled={isUploading}
+                    hidden
+                  />
+                </label>
+                {photoUrl && (
+                  <button
+                    type="button"
+                    className="btn-ghost photo-remove"
+                    onClick={handleRemovePhoto}
+                    disabled={isUploading}
+                  >
+                    Retirer
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 

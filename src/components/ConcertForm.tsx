@@ -31,6 +31,12 @@ const EMPTY_FORM = {
   isShared: false,
 }
 
+// L'URL publique finit par .../concerts/123456.jpg → on extrait "123456.jpg"
+function fileNameFromPublicUrl(url: string): string | null {
+  const parts = url.split('/concerts/')
+  return parts.length === 2 ? parts[1] : null
+}
+
 function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
   const [form, setForm] = useState(
     concert
@@ -88,6 +94,14 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
     setIsUploading(true)
     setErrorMessage('')
 
+    // Remplacement propre : supprimer l'ancienne image d'abord, s'il y en a une
+    if (photoUrl) {
+      const oldName = fileNameFromPublicUrl(photoUrl)
+      if (oldName) {
+        await supabase.storage.from('concerts').remove([oldName])
+      }
+    }
+
     const fileExtension = file.name.split('.').pop()
     const fileName = `${Date.now()}.${fileExtension}`
 
@@ -105,6 +119,16 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
 
     setPhotoUrl(data.publicUrl)
     setIsUploading(false)
+  }
+
+  async function handleRemovePhoto() {
+    if (!photoUrl) return
+
+    const oldName = fileNameFromPublicUrl(photoUrl)
+    if (oldName) {
+      await supabase.storage.from('concerts').remove([oldName])
+    }
+    setPhotoUrl('')
   }
 
   function addLineupRow() {
@@ -208,16 +232,28 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
                   <span className="photo-placeholder">{form.name || 'Aperçu'}</span>
                 )}
               </div>
-              <label className="btn-ghost photo-btn">
-                {isUploading ? 'Envoi...' : 'Choisir une image'}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  disabled={isUploading}
-                  hidden
-                />
-              </label>
+              <div className="photo-buttons">
+                <label className="btn-ghost photo-btn">
+                  {isUploading ? 'Envoi...' : photoUrl ? 'Changer' : 'Choisir une image'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    disabled={isUploading}
+                    hidden
+                  />
+                </label>
+                {photoUrl && (
+                  <button
+                    type="button"
+                    className="btn-ghost photo-remove"
+                    onClick={handleRemovePhoto}
+                    disabled={isUploading}
+                  >
+                    Retirer
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 

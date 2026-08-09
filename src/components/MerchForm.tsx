@@ -77,6 +77,11 @@ function MerchForm({ item, groupes, profils, currentUserId, onClose, onSaved }: 
     setIsUploading(true)
     setErrorMessage('')
 
+    // Remplacement propre : supprimer l'ancien fichier d'abord, s'il y en a un
+    if (photoPath) {
+      await supabase.storage.from('merch').remove([photoPath])
+    }
+
     const fileExtension = file.name.split('.').pop()
     const fileName = `${Date.now()}.${fileExtension}`
 
@@ -99,6 +104,14 @@ function MerchForm({ item, groupes, profils, currentUserId, onClose, onSaved }: 
 
     if (data) setPhotoPreview(data.signedUrl)
     setIsUploading(false)
+  }
+
+  async function handleRemovePhoto() {
+    if (!photoPath) return
+
+    await supabase.storage.from('merch').remove([photoPath])
+    setPhotoPath('')
+    setPhotoPreview('')
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -168,16 +181,28 @@ function MerchForm({ item, groupes, profils, currentUserId, onClose, onSaved }: 
                   <span className="photo-placeholder">{form.name || 'Aperçu'}</span>
                 )}
               </div>
-              <label className="btn-ghost photo-btn">
-                {isUploading ? 'Envoi...' : 'Choisir une image'}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  disabled={isUploading}
-                  hidden
-                />
-              </label>
+              <div className="photo-buttons">
+                <label className="btn-ghost photo-btn">
+                  {isUploading ? 'Envoi...' : photoPath ? 'Changer' : 'Choisir une image'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    disabled={isUploading}
+                    hidden
+                  />
+                </label>
+                {photoPath && (
+                  <button
+                    type="button"
+                    className="btn-ghost photo-remove"
+                    onClick={handleRemovePhoto}
+                    disabled={isUploading}
+                  >
+                    Retirer
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
