@@ -19,6 +19,7 @@ type ConcertRow = {
   price: number | null
   added_by: string
   is_shared: boolean
+  photo_url: string | null
 }
 
 type ActivityEntry = {
@@ -32,6 +33,8 @@ type ActivityEntry = {
 function HomePage() {
   const [concerts, setConcerts] = useState<ConcertRow[]>([])
   const [profils, setProfils] = useState<Profil[]>([])
+  const [lineup, setLineup] = useState<{ concert_id: number; groupe_id: number | null }[]>([])
+  const [groupePhotos, setGroupePhotos] = useState<{ id: number; photo_url: string | null }[]>([])
   const [groupesCount, setGroupesCount] = useState(0)
   const [merchCount, setMerchCount] = useState(0)
   const [activity, setActivity] = useState<ActivityEntry[]>([])
@@ -45,12 +48,18 @@ function HomePage() {
         { data: reveRows },
         { data: merchRows },
         { data: profilRows },
+        { data: lineupRows },
+        { data: groupePhotoRows },
       ] = await Promise.all([
         supabase.from('concerts').select('*'),
         supabase.from('groupes').select('id, name, created_at, added_by'),
         supabase.from('reves').select('id, title, created_at, added_by'),
         supabase.from('merch').select('id, name, created_at, owner_id'),
         supabase.from('profils').select('*'),
+        supabase.from('concert_lineup').select('concert_id, groupe_id'),
+        supabase.from('groupes').select('id, photo_url'),
+        supabase.from('concert_lineup').select('concert_id, groupe_id'),
+        supabase.from('groupes').select('id, photo_url'),
       ])
 
       const profilsData = (profilRows ?? []) as Profil[]
@@ -99,6 +108,8 @@ function HomePage() {
       setMerchCount((merchRows ?? []).length)
       setActivity(entries)
       setIsLoading(false)
+      setLineup(lineupRows ?? [])
+      setGroupePhotos(groupePhotoRows ?? [])
     }
 
     loadHome()
@@ -114,6 +125,16 @@ function HomePage() {
   const nextParticipants: Participant[] = nextConcert
     ? resolveParticipants(profils, nextConcert.added_by, nextConcert.is_shared)
     : []
+  const nextPosterPhoto = (() => {
+    if (!nextConcert) return null
+    if (nextConcert.photo_url) return nextConcert.photo_url
+    const followed = lineup.filter((l) => l.concert_id === nextConcert.id && l.groupe_id !== null)
+    if (followed.length === 1) {
+      const g = groupePhotos.find((gp) => gp.id === followed[0].groupe_id)
+      return g?.photo_url ?? null
+    }
+    return null
+  })()
 
   if (isLoading) {
     return (
@@ -166,15 +187,20 @@ function HomePage() {
           </div>
 
           <section className="next-concert">
-            <div className="nc-poster">
-              <div className="placeholder-tag">Photo · à uploader</div>
-              <div className="band-block">
-                <div className="band-genre">
-                  {nextConcert.genre === 'kpop' ? 'K-Pop' : 'Métal'} · {nextConcert.city}
+            <div className={`nc-poster ${nextPosterPhoto ? 'has-photo' : ''}`}>
+                  {nextPosterPhoto ? (
+                    <img src={nextPosterPhoto} alt={nextConcert.name} className="nc-poster-img" />
+                  ) : (
+                    <>
+                      <div className="band-block">
+                        <div className="band-genre">
+                          {nextConcert.genre === 'kpop' ? 'K-Pop' : 'Métal'} · {nextConcert.city}
+                        </div>
+                        <div className="band-name">{nextConcert.name.toUpperCase()}</div>
+                      </div>
+                    </>
+                  )}
                 </div>
-                <div className="band-name">{nextConcert.name.toUpperCase()}</div>
-              </div>
-            </div>
             <div className="nc-info">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
