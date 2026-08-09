@@ -28,7 +28,7 @@ function ConcertsPage() {
         supabase.from('concerts').select('*'),
         supabase.from('profils').select('*'),
         supabase.from('concert_lineup').select('*'),
-        supabase.from('groupes').select('id, name'),
+        supabase.from('groupes').select('id, name, photo_url'),
       ])
 
     const profils = (profilRows ?? []) as Profil[]
@@ -44,6 +44,7 @@ function ConcertsPage() {
             id: l.id,
             groupeId: l.groupe_id,
             groupeName: l.groupe_id !== null ? (groupe?.name ?? '?') : (l.groupe_name ?? ''),
+            groupePhotoUrl: l.groupe_id !== null ? (groupe?.photo_url ?? null) : null,
             isFollowed: l.groupe_id !== null,
           }
         })
@@ -58,6 +59,7 @@ function ConcertsPage() {
         isShared: row.is_shared,
         photoLabel: `Photo · ${row.name}`,
         bigBg: row.name.toUpperCase(),
+        photoUrl: row.photo_url,
         date: formatConcertDate(row.event_date),
         price: row.price ?? 0,
         name: row.name,
@@ -80,7 +82,6 @@ function ConcertsPage() {
     loadConcerts()
   }, [])
 
-  // Une fois les concerts affichés, si un focus est demandé, on y défile
   useEffect(() => {
     if (isLoading || !focusId) return
 

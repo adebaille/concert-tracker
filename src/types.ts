@@ -13,6 +13,7 @@ export type LineupEntry = {
   id: number
   groupeId: number | null
   groupeName: string
+  groupePhotoUrl: string | null
   isFollowed: boolean
 }
 
@@ -33,6 +34,7 @@ export type Concert = {
   isShared: boolean
   photoLabel: string
   bigBg: string
+  photoUrl: string | null
   date: string
   price: number
   name: string
