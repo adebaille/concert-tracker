@@ -17,22 +17,20 @@
 }
 .gd-header .band-cover {
   width: 280px;
-  height: 180px;
-  border-radius: 20px;
   flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  font-family: var(--font-display);
-  font-size: 30px;
-  color: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
   overflow: hidden;
+  background: var(--bg-elev-2);
 }
 .gd-header .band-cover-img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
 }
 .gd-header .band-cover-fallback {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
   font-family: var(--font-display);
   font-size: 22px;
   line-height: 1.1;
@@ -296,7 +294,6 @@
   }
   .gd-header .band-cover {
     width: 100%;
-    height: 180px;
   }
   .gd-name { font-size: 30px; }
   .gd-membres {
