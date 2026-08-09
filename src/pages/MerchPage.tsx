@@ -68,9 +68,29 @@ function MerchPage() {
         ownerId: row.owner_id,
         isShared: row.is_shared,
         anecdote: row.anecdote ?? '',
+        photoPath: row.photo_url,
+        photoUrl: null,
         participants: resolveParticipants(profilsData, row.owner_id, row.is_shared),
       }
     })
+
+    // Bucket privé : générer les URLs signées pour les items qui ont une photo
+    const pathsToSign = formatted
+      .filter((item) => item.photoPath)
+      .map((item) => item.photoPath as string)
+
+    if (pathsToSign.length > 0) {
+      const { data: signed } = await supabase.storage
+        .from('merch')
+        .createSignedUrls(pathsToSign, 3600)
+
+      if (signed) {
+        for (const item of formatted) {
+          const match = signed.find((s) => s.path === item.photoPath)
+          item.photoUrl = match?.signedUrl ?? null
+        }
+      }
+    }
 
     setMerchItems(formatted)
     setIsLoading(false)

@@ -105,4 +105,6 @@ export type MerchItem = {
   isShared: boolean
   anecdote: string
   participants: Participant[]
+  photoPath: string | null
+  photoUrl: string | null
 }
