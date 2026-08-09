@@ -169,3 +169,16 @@
 .photo-btn {
   cursor: pointer;
 }
+.photo-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.photo-remove {
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.photo-remove:hover {
+  color: var(--metal);
+  border-color: var(--metal);
+}
