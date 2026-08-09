@@ -20,6 +20,14 @@ function ConcertCard({ concert, isFocused, onEdit, onDelete }: ConcertCardProps)
     const content = buildConcertICS(concert);
     downloadICS(`${concert.name}.ics`, content);
   }
+
+  // Photo en poster seulement si UN seul groupe est à l'affiche ET qu'il est suivi
+  // avec une photo. Sinon (plusieurs groupes, festival, nom libre) : nom + vignettes.
+  const soloEntry = concert.lineup.length === 1 ? concert.lineup[0] : null;
+  const soloGroupPhoto =
+    soloEntry && soloEntry.isFollowed ? soloEntry.groupePhotoUrl : null;
+  const posterPhoto = concert.photoUrl ?? soloGroupPhoto;
+
   return (
     <article
       id={`concert-${concert.id}`}
@@ -38,9 +46,14 @@ function ConcertCard({ concert, isFocused, onEdit, onDelete }: ConcertCardProps)
           ✕
         </button>
       </div>
-      <div className={`cc-poster ${concert.genre}`}>
-        <div className="placeholder-line">{concert.photoLabel}</div>
-        <div className="big-bg">{concert.bigBg}</div>
+      <div className={`cc-poster ${concert.genre} ${posterPhoto ? "has-photo" : ""}`}>
+        {posterPhoto ? (
+          <img src={posterPhoto} alt={concert.name} className="cc-poster-img" />
+        ) : (
+          <>
+            <div className="big-bg">{concert.bigBg}</div>
+          </>
+        )}
         <span className={`status-badge ${concert.status}`}>
           {STATUS_LABELS[concert.status]}
         </span>
@@ -60,7 +73,14 @@ function ConcertCard({ concert, isFocused, onEdit, onDelete }: ConcertCardProps)
             {concert.lineup.map((entry) => (
               <span
                 key={entry.id}
-                className={`lineup-tag ${entry.isFollowed ? "followed" : ""}`}>
+                className={`lineup-tag ${entry.isFollowed ? "followed" : ""} ${
+                  entry.groupePhotoUrl ? "has-photo" : ""
+                }`}>
+                {entry.groupePhotoUrl && (
+                  <span className="lineup-tag-photo">
+                    <img src={entry.groupePhotoUrl} alt={entry.groupeName} />
+                  </span>
+                )}
                 {entry.groupeName}
               </span>
             ))}

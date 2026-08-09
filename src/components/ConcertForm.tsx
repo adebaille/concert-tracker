@@ -52,6 +52,9 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
       : EMPTY_FORM
   )
 
+  const [photoUrl, setPhotoUrl] = useState(concert?.photoUrl ?? '')
+  const [isUploading, setIsUploading] = useState(false)
+
   const [lineup, setLineup] = useState<LineupDraft[]>(
     concert
       ? concert.lineup.map((entry) => ({
@@ -76,6 +79,32 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
 
   function updateField(field: keyof typeof EMPTY_FORM, value: string | number | boolean) {
     setForm((previous) => ({ ...previous, [field]: value }))
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+    setErrorMessage('')
+
+    const fileExtension = file.name.split('.').pop()
+    const fileName = `${Date.now()}.${fileExtension}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('concerts')
+      .upload(fileName, file)
+
+    if (uploadError) {
+      setErrorMessage('Upload impossible : ' + uploadError.message)
+      setIsUploading(false)
+      return
+    }
+
+    const { data } = supabase.storage.from('concerts').getPublicUrl(fileName)
+
+    setPhotoUrl(data.publicUrl)
+    setIsUploading(false)
   }
 
   function addLineupRow() {
@@ -111,6 +140,7 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
       setlist: form.setlist || null,
       anecdote: form.anecdote || null,
       is_shared: form.isShared,
+      photo_url: photoUrl || null,
     }
 
     let concertId = concert?.id
@@ -129,7 +159,6 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
       concertId = data.id
     }
 
-    // On remplace tout le lineup : on efface l'existant, on réinsère
     await supabase.from('concert_lineup').delete().eq('concert_id', concertId)
 
     const lineupRows = lineup
@@ -167,6 +196,29 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
               onChange={(e) => updateField('name', e.target.value)}
               required
             />
+          </div>
+
+          <div className="field">
+            <label>Photo / affiche</label>
+            <div className="photo-upload">
+              <div className="photo-preview">
+                {photoUrl ? (
+                  <img src={photoUrl} alt="Aperçu" />
+                ) : (
+                  <span className="photo-placeholder">{form.name || 'Aperçu'}</span>
+                )}
+              </div>
+              <label className="btn-ghost photo-btn">
+                {isUploading ? 'Envoi...' : 'Choisir une image'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                  hidden
+                />
+              </label>
+            </div>
           </div>
 
           <div className="form-row">
@@ -334,7 +386,7 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
 
           <div className="form-actions">
             <button type="button" className="btn-ghost" onClick={onClose}>Annuler</button>
-            <button type="submit" className="btn-ghost primary" disabled={isSaving}>
+            <button type="submit" className="btn-ghost primary" disabled={isSaving || isUploading}>
               {isSaving ? 'Enregistrement...' : concert ? 'Enregistrer' : 'Ajouter'}
             </button>
           </div>

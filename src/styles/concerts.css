@@ -81,14 +81,16 @@
 }
 .cc-poster .big-bg {
   position: absolute;
-  bottom: -10px;
-  left: -6px;
+  bottom: 10px;
+  left: 16px;
+  right: 16px;
   font-family: var(--font-display);
-  font-size: 100px;
-  line-height: 0.8;
+  font-size: 64px;
+  line-height: 0.9;
   letter-spacing: -0.01em;
-  color: rgba(255, 255, 255, 0.1);
-  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.14);
+  white-space: normal;
+  overflow: hidden;
   pointer-events: none;
 }
 .cc-poster.kpop {
@@ -323,4 +325,34 @@
   100% {
     box-shadow: 0 0 0 0 transparent, 0 0 0 transparent;
   }
+}
+.cc-poster.has-photo {
+  padding: 0;
+}
+.cc-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  position: absolute;
+  inset: 0;
+}
+.lineup-tag.has-photo {
+  padding-left: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.lineup-tag-photo {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: block;
+}
+.lineup-tag-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
