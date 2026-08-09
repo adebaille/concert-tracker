@@ -58,11 +58,47 @@ function MerchForm({ item, groupes, profils, currentUserId, onClose, onSaved }: 
           anecdote: '',
         }
   )
+
+  const [photoPath, setPhotoPath] = useState(item?.photoPath ?? '')
+  const [photoPreview, setPhotoPreview] = useState(item?.photoUrl ?? '')
+  const [isUploading, setIsUploading] = useState(false)
+
   const [errorMessage, setErrorMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
 
   function updateField(field: keyof typeof form, value: string | boolean) {
     setForm((previous) => ({ ...previous, [field]: value }))
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+    setErrorMessage('')
+
+    const fileExtension = file.name.split('.').pop()
+    const fileName = `${Date.now()}.${fileExtension}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('merch')
+      .upload(fileName, file)
+
+    if (uploadError) {
+      setErrorMessage('Upload impossible : ' + uploadError.message)
+      setIsUploading(false)
+      return
+    }
+
+    // Bucket privé : on stocke le CHEMIN, et on génère une URL signée juste pour l'aperçu
+    setPhotoPath(fileName)
+
+    const { data } = await supabase.storage
+      .from('merch')
+      .createSignedUrl(fileName, 3600)
+
+    if (data) setPhotoPreview(data.signedUrl)
+    setIsUploading(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -80,6 +116,7 @@ function MerchForm({ item, groupes, profils, currentUserId, onClose, onSaved }: 
       owner_id: form.ownerId,
       is_shared: form.isShared,
       anecdote: form.anecdote || null,
+      photo_url: photoPath || null,
     }
 
     let response
@@ -119,6 +156,29 @@ function MerchForm({ item, groupes, profils, currentUserId, onClose, onSaved }: 
               onChange={(e) => updateField('name', e.target.value)}
               required
             />
+          </div>
+
+          <div className="field">
+            <label>Photo de l'item</label>
+            <div className="photo-upload">
+              <div className="photo-preview">
+                {photoPreview ? (
+                  <img src={photoPreview} alt="Aperçu" />
+                ) : (
+                  <span className="photo-placeholder">{form.name || 'Aperçu'}</span>
+                )}
+              </div>
+              <label className="btn-ghost photo-btn">
+                {isUploading ? 'Envoi...' : 'Choisir une image'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                  hidden
+                />
+              </label>
+            </div>
           </div>
 
           <div className="form-row">
@@ -206,7 +266,7 @@ function MerchForm({ item, groupes, profils, currentUserId, onClose, onSaved }: 
 
           <div className="form-actions">
             <button type="button" className="btn-ghost" onClick={onClose}>Annuler</button>
-            <button type="submit" className="btn-ghost primary" disabled={isSaving}>
+            <button type="submit" className="btn-ghost primary" disabled={isSaving || isUploading}>
               {isSaving ? 'Enregistrement...' : item ? 'Enregistrer' : 'Ajouter'}
             </button>
           </div>

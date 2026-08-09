@@ -29,9 +29,15 @@ function MerchItemCard({ item, isFocused, onEdit, onDelete }: MerchItemCardProps
         <button title="Modifier" onClick={() => onEdit(item)}>✎</button>
         <button title="Supprimer" onClick={() => onDelete(item)}>✕</button>
       </div>
-      <div className={`preview ${item.previewStyle}`}>
-        <span className="bg-text">{item.bgText}</span>
-        <Icon className="preview-icon" size={34} />
+      <div className={`preview ${item.previewStyle} ${item.photoUrl ? 'has-photo' : ''}`}>
+        {item.photoUrl ? (
+          <img src={item.photoUrl} alt={item.name} className="preview-img" />
+        ) : (
+          <>
+            <span className="bg-text">{item.bgText}</span>
+            <Icon className="preview-icon" size={34} />
+          </>
+        )}
       </div>
       <div className="body">
         <div className="cat">{item.details}</div>
