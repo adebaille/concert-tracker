@@ -1,0 +1,133 @@
+.pa-wrap {
+  max-width: 640px;
+}
+.pa-section {
+  background: var(--bg-elev-1);
+  border: 0.5px solid var(--hair);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.pa-section-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+.pa-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.pa-field:last-of-type {
+  margin-bottom: 18px;
+}
+.pa-field label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.pa-field input {
+  background: var(--bg-elev-2);
+  border: 0.5px solid var(--hair);
+  border-radius: var(--r-sm, 8px);
+  padding: 11px 13px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--t-fast) var(--ease);
+}
+.pa-field input:focus {
+  border-color: var(--kpop);
+}
+.pa-message {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--kpop-soft);
+  margin-bottom: 14px;
+}
+.pa-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Ligne profil : avatar + prénom côte à côte */
+.pa-profile-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+.pa-avatar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.pa-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 34px;
+  color: #fff;
+  border: 2px solid var(--kpop);
+}
+.pa-avatar.metal {
+  border-color: var(--metal);
+}
+.pa-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pa-profile-fields {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .pa-profile-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .pa-avatar-block {
+    align-self: center;
+  }
+  .pa-actions {
+    justify-content: stretch;
+  }
+  .pa-actions button {
+    width: 100%;
+  }
+}
+.pa-avatar-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+.pa-avatar-btn,
+.pa-avatar-remove {
+  cursor: pointer;
+  font-size: 11px;
+  text-align: center;
+  padding: 6px 10px;
+}
+.pa-avatar-remove {
+  color: var(--text-muted);
+}
+.pa-avatar-remove:hover {
+  color: var(--metal);
+  border-color: var(--metal);
+}

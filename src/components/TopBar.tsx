@@ -44,6 +44,7 @@ function Topbar({ currentPage, onAdd }: TopbarProps) {
 
   const displayName = profil?.display_name ?? '…'
   const avatarStyle = profil?.avatar_style ?? 'kpop'
+  const avatarUrl = profil?.avatar_url ?? null
 
   return (
     <div className="topbar">
@@ -55,7 +56,9 @@ function Topbar({ currentPage, onAdd }: TopbarProps) {
       <div className="topbar-right">
         <div className="account" ref={menuRef}>
           <button className="user-pill" onClick={() => setMenuOpen((open) => !open)}>
-            <div className={`avatar ${avatarStyle}`}>{displayName[0]}</div>
+            <div className={`avatar ${avatarStyle}`}>
+              {avatarUrl ? <img src={avatarUrl} alt="" /> : displayName[0]}
+            </div>
             <span className="label">{displayName}</span>
           </button>
           {menuOpen && (
