@@ -446,6 +446,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
+  overflow: hidden;
   display: grid;
   place-items: center;
   font-family: var(--font-display);
@@ -453,6 +454,11 @@
   letter-spacing: 0.04em;
   color: #fff;
   flex-shrink: 0;
+}
+.act-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .act-avatar.metal {
   background: var(--grad-metal);

@@ -2,11 +2,13 @@ export type Profil = {
   id: string
   display_name: string
   avatar_style: 'kpop' | 'metal'
+  avatar_url: string | null
 }
 
 export type Participant = {
   name: string
   avatarStyle: 'kpop' | 'metal'
+  avatarUrl: string | null
 }
 
 export type LineupEntry = {

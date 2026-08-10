@@ -13,6 +13,7 @@ type MembreEntry = {
   userId: string
   name: string
   avatarStyle: 'kpop' | 'metal'
+  avatarUrl: string | null
   count: number
   hype: number
 }
@@ -93,6 +94,7 @@ function GroupDetailPage() {
           userId: m.user_id,
           name: p?.display_name ?? '?',
           avatarStyle: p?.avatar_style ?? 'kpop',
+          avatarUrl: p?.avatar_url ?? null,
           count: m.seen_count,
           hype: m.hype_level,
         }
@@ -211,7 +213,9 @@ function GroupDetailPage() {
           {groupe.membres.map((m) => (
             <div key={m.userId} className="gd-membre-card">
               <div className="gd-membre-head">
-                <span className={`avatar ${m.avatarStyle}`}>{m.name[0]}</span>
+                <span className={`avatar ${m.avatarStyle}`}>
+                  {m.avatarUrl ? <img src={m.avatarUrl} alt="" /> : m.name[0]}
+                </span>
                 <span className="gd-membre-name">{m.name}</span>
               </div>
               <div className="gd-membre-row">

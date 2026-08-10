@@ -27,6 +27,7 @@ type ActivityEntry = {
   createdAt: string
   authorName: string
   authorAvatarStyle: 'kpop' | 'metal'
+  authorAvatarUrl: string | null
   text: string
 }
 
@@ -70,6 +71,7 @@ function HomePage() {
         return {
           authorName: profil?.display_name ?? '?',
           authorAvatarStyle: profil?.avatar_style ?? ('kpop' as const),
+          authorAvatarUrl: profil?.avatar_url ?? null,
         }
       }
 
@@ -306,7 +308,9 @@ function HomePage() {
           <div className="activity">
             {activity.map((entry) => (
               <div key={entry.key} className="act">
-                <div className={`act-avatar ${entry.authorAvatarStyle}`}>{entry.authorName[0]}</div>
+                <div className={`act-avatar ${entry.authorAvatarStyle}`}>
+                  {entry.authorAvatarUrl ? <img src={entry.authorAvatarUrl} alt="" /> : entry.authorName[0]}
+                </div>
                 <div>
                   <div className="act-text"><strong>{entry.authorName}</strong> {entry.text}</div>
                   <div className="act-time">{formatConcertDate(entry.createdAt)}</div>

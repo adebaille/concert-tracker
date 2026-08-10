@@ -1,7 +1,11 @@
 import type { Participant, Profil } from '../types'
 
 function toParticipant(profil: Profil): Participant {
-  return { name: profil.display_name, avatarStyle: profil.avatar_style }
+  return {
+    name: profil.display_name,
+    avatarStyle: profil.avatar_style,
+    avatarUrl: profil.avatar_url,
+  }
 }
 
 export function resolveParticipants(
