@@ -138,9 +138,9 @@ function ReveForm({ reve, onClose, onSaved }: ReveFormProps) {
             <div className="field">
               <label>Priorité</label>
               <select value={form.priority} onChange={(e) => updateField('priority', e.target.value)}>
-                <option value="ultime">Rêve ultime</option>
-                <option value="haute">Haute</option>
-                <option value="moyenne">Moyenne</option>
+                <option value="haute">Priorité haute</option>
+                <option value="moyenne">Priorité moyenne</option>
+                <option value="basse">Priorité basse</option>
               </select>
             </div>
             <div className="field">

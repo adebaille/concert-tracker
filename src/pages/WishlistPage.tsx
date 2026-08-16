@@ -8,11 +8,12 @@ import Topbar from '../components/TopBar'
 import DreamCard from '../components/DreamCard'
 import ReveForm from '../components/ReveForm'
 import type { Reve, Profil } from '../types'
+import { SignalHigh, SignalMedium, SignalLow, Wallet } from 'lucide-react'
 
 const COLUMNS = [
-  { priority: 'ultime' as const, icon: '🌙', label: 'Rêve ultime', unit: 'rêves' },
-  { priority: 'haute' as const, icon: '🔥', label: 'Haute', unit: 'envies' },
-  { priority: 'moyenne' as const, icon: '💛', label: 'Moyenne', unit: 'envies' },
+  { priority: 'haute' as const, icon: SignalHigh, label: 'Priorité haute', unit: 'rêves' },
+  { priority: 'moyenne' as const, icon: SignalMedium, label: 'Priorité moyenne', unit: 'envies' },
+  { priority: 'basse' as const, icon: SignalLow, label: 'Priorité basse', unit: 'envies' },
 ]
 
 function WishlistPage() {
@@ -20,7 +21,7 @@ function WishlistPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingReve, setEditingReve] = useState<Reve | null>(null)
-  const [activeFilter, setActiveFilter] = useState<'toutes' | 'ultime' | 'haute' | 'moyenne'>('toutes')
+  const [activeFilter, setActiveFilter] = useState<'toutes' | 'haute' | 'moyenne' | 'basse'>('toutes')
   const [searchQuery, setSearchQuery] = useState('')
 
   const [searchParams] = useSearchParams()
@@ -109,9 +110,9 @@ function WishlistPage() {
     r.title.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const ultimeCount = reves.filter((r) => r.priority === 'ultime').length
   const hauteCount = reves.filter((r) => r.priority === 'haute').length
   const moyenneCount = reves.filter((r) => r.priority === 'moyenne').length
+  const basseCount = reves.filter((r) => r.priority === 'basse').length
   const totalBudget = reves.reduce((total, r) => total + r.budget, 0)
 
   const visibleColumns = COLUMNS.filter(
@@ -132,39 +133,39 @@ function WishlistPage() {
       <Topbar currentPage="Wishlist" onAdd={openCreateForm} />
 
       <div className="page-head">
-        <h1 className="page-title"><span className="accent">Wishlist</span> · les rêves</h1>
+        <h1 className="page-title"><span className="accent">Wishlist</span></h1>
         <div className="page-sub">
           <span>{reves.length} concerts rêvés</span><span className="dot"></span>
-          <span>{ultimeCount} rêves ultimes</span><span className="dot"></span>
-          <span>{hauteCount} hautes priorités</span><span className="dot"></span>
-          <span>{moyenneCount} envies modérées</span>
+          <span>{hauteCount} priorité haute</span><span className="dot"></span>
+          <span>{moyenneCount} priorité moyenne</span><span className="dot"></span>
+          <span>{basseCount} priorité basse</span>
         </div>
       </div>
 
       <section className="wl-summary">
         <div className="wl-stat">
-          <div className="ico-circle">🌙</div>
-          <div className="body">
-            <div className="v">{String(ultimeCount).padStart(2, '0')}</div>
-            <div className="l">Rêves ultimes</div>
-          </div>
-        </div>
-        <div className="wl-stat">
-          <div className="ico-circle">🔥</div>
+          <div className="ico-circle"><SignalHigh size={20} /></div>
           <div className="body">
             <div className="v">{String(hauteCount).padStart(2, '0')}</div>
             <div className="l">Priorité haute</div>
           </div>
         </div>
         <div className="wl-stat">
-          <div className="ico-circle">💛</div>
+          <div className="ico-circle"><SignalMedium size={20} /></div>
           <div className="body">
             <div className="v">{String(moyenneCount).padStart(2, '0')}</div>
             <div className="l">Priorité moyenne</div>
           </div>
         </div>
         <div className="wl-stat">
-          <div className="ico-circle">💸</div>
+          <div className="ico-circle"><SignalLow size={20} /></div>
+          <div className="body">
+            <div className="v">{String(basseCount).padStart(2, '0')}</div>
+            <div className="l">Priorité basse</div>
+          </div>
+        </div>
+        <div className="wl-stat">
+          <div className="ico-circle"><Wallet size={20} /></div>
           <div className="body">
             <div className="v">{totalBudget.toLocaleString('fr-FR')} €</div>
             <div className="l">Budget rêvé total</div>
@@ -176,14 +177,14 @@ function WishlistPage() {
         <button className={`filter-chip ${activeFilter === 'toutes' ? 'active' : ''}`} onClick={() => setActiveFilter('toutes')}>
           Toutes <span className="count">{reves.length}</span>
         </button>
-        <button className={`filter-chip ${activeFilter === 'ultime' ? 'active' : ''}`} onClick={() => setActiveFilter('ultime')}>
-          Rêve ultime <span className="count">{ultimeCount}</span>
-        </button>
         <button className={`filter-chip ${activeFilter === 'haute' ? 'active' : ''}`} onClick={() => setActiveFilter('haute')}>
-          Haute <span className="count">{hauteCount}</span>
+          Priorité haute <span className="count">{hauteCount}</span>
         </button>
         <button className={`filter-chip ${activeFilter === 'moyenne' ? 'active' : ''}`} onClick={() => setActiveFilter('moyenne')}>
-          Moyenne <span className="count">{moyenneCount}</span>
+          Priorité moyenne <span className="count">{moyenneCount}</span>
+        </button>
+        <button className={`filter-chip ${activeFilter === 'basse' ? 'active' : ''}`} onClick={() => setActiveFilter('basse')}>
+          Priorité basse <span className="count">{basseCount}</span>
         </button>
         <div className="filter-sep"></div>
         <div className="filter-search">
@@ -202,7 +203,7 @@ function WishlistPage() {
             <div key={col.priority} className={`wl-col ${col.priority}`}>
               <div className="wl-col-head">
                 <div className="wl-col-title">
-                  <div className="icon-circle">{col.icon}</div>
+                  <div className="icon-circle"><col.icon size={18} /></div>
                   {col.label}
                 </div>
                 <div className="wl-col-count">

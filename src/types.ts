@@ -74,7 +74,7 @@ export type Groupe = {
 
 export type Reve = {
   id: number
-  priority: 'ultime' | 'haute' | 'moyenne'
+  priority: 'haute' | 'moyenne' | 'basse'
   genre: 'kpop' | 'metal'
   title: string
   subtitle: string
