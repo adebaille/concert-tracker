@@ -4,6 +4,7 @@ import { Home, Ticket, Music, Star, ShoppingBag } from 'lucide-react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabaseClient'
 import LoginPage from './pages/LoginPage'
+import logo from './assets/logo-sans-fond.svg'
 
 const NAV_ITEMS = [
   { id: 'accueil', label: 'Accueil', to: '/', icon: Home },
@@ -41,7 +42,9 @@ function App() {
       <div className="app">
         <aside className="sidebar">
           <div className="brand">
-            <div className="brand-mark"></div>
+            <div className="brand-mark">
+            <img src={logo} alt="Logo Concert Tracker" />
+          </div>
             <div>
               <div className="brand-name">CONCERT TRACKER</div>
               <div className="brand-sub">v1.0</div>
