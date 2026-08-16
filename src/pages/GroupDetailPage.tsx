@@ -39,7 +39,7 @@ type GroupeReve = {
   id: number
   title: string
   subtitle: string
-  priority: 'ultime' | 'haute' | 'moyenne'
+  priority: 'haute' | 'moyenne' | 'basse'
 }
 
 type GroupeDetail = {
@@ -309,7 +309,7 @@ function GroupDetailPage() {
                 <span className="gd-reve-title">{r.title}</span>
                 {r.subtitle && <span className="gd-reve-subtitle">{r.subtitle}</span>}
                 <span className={`gd-reve-priority ${r.priority}`}>
-                  {r.priority === 'ultime' ? 'Rêve ultime' : r.priority === 'haute' ? 'Haute' : 'Moyenne'}
+                  {r.priority === 'haute' ? 'Priorité haute' : r.priority === 'moyenne' ? 'Priorité moyenne' : 'Priorité basse'}
                 </span>
               </Link>
             ))}

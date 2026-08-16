@@ -9,8 +9,8 @@ type DreamCardProps = {
 }
 
 function DreamCard({ reve, isFocused, onEdit, onDelete }: DreamCardProps) {
-  const dateLabel = reve.priority === 'ultime' ? 'Date estimée' : 'Date possible'
-  const budgetLabel = reve.priority === 'ultime' ? 'Budget rêvé' : 'Budget'
+  const dateLabel = reve.priority === 'haute' ? 'Date estimée' : 'Date possible'
+  const budgetLabel = reve.priority === 'haute' ? 'Budget rêvé' : 'Budget'
 
   const footLabel = reve.note
     ? `${participantsLabel(reve.participants)} · ${reve.note}`
