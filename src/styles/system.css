@@ -155,29 +155,24 @@ body::after {
 }
 .brand {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  text-align: center;
   margin-bottom: var(--s-10);
 }
 .brand-mark {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  background: var(--grad-primary);
+  width: 100px;
+  height: 100px;
+  border-radius: 16px;
   position: relative;
-  box-shadow:
-    0 0 24px rgba(176, 106, 255, 0.45),
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.2);
-  display: grid;
-  place-items: center;
+  overflow: hidden;
 }
-.brand-mark::after {
-  content: "";
-  width: 14px;
-  height: 14px;
-  background:
-    radial-gradient(circle at 30% 35%, #fff 0 2px, transparent 2.5px),
-    radial-gradient(circle at 70% 35%, #fff 0 2px, transparent 2.5px);
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .brand-name {
   font-family: var(--font-display);
