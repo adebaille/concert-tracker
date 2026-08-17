@@ -5,6 +5,7 @@ import type { Concert, GroupeOption } from '../types'
 
 type ConcertFormProps = {
   concert: Concert | null
+  initialValues?: ConcertInitialValues
   onClose: () => void
   onSaved: () => void
 }
@@ -13,6 +14,13 @@ type LineupDraft = {
   mode: 'suivi' | 'libre'
   groupeId: string
   groupeName: string
+}
+
+type ConcertInitialValues = {
+  name?: string
+  genre?: string
+  price?: string
+  lineup?: LineupDraft[]
 }
 
 const EMPTY_FORM = {
@@ -37,7 +45,7 @@ function fileNameFromPublicUrl(url: string): string | null {
   return parts.length === 2 ? parts[1] : null
 }
 
-function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
+function ConcertForm({ concert, initialValues, onClose, onSaved }: ConcertFormProps) {
   const [form, setForm] = useState(
     concert
       ? {
@@ -55,20 +63,25 @@ function ConcertForm({ concert, onClose, onSaved }: ConcertFormProps) {
           anecdote: concert.anecdote ?? '',
           isShared: concert.isShared,
         }
-      : EMPTY_FORM
+      : {
+          ...EMPTY_FORM,
+          name: initialValues?.name ?? EMPTY_FORM.name,
+          genre: initialValues?.genre ?? EMPTY_FORM.genre,
+          price: initialValues?.price ?? EMPTY_FORM.price,
+        }
   )
 
   const [photoUrl, setPhotoUrl] = useState(concert?.photoUrl ?? '')
   const [isUploading, setIsUploading] = useState(false)
 
-  const [lineup, setLineup] = useState<LineupDraft[]>(
+ const [lineup, setLineup] = useState<LineupDraft[]>(
     concert
       ? concert.lineup.map((entry) => ({
           mode: entry.isFollowed ? 'suivi' : 'libre',
           groupeId: entry.groupeId !== null ? String(entry.groupeId) : '',
           groupeName: entry.isFollowed ? '' : entry.groupeName,
         }))
-      : []
+      : initialValues?.lineup ?? []
   )
 
   const [groupeOptions, setGroupeOptions] = useState<GroupeOption[]>([])

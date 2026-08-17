@@ -1,14 +1,16 @@
 import type { Reve } from '../types'
 import { participantsLabel } from '../lib/participants'
+import { Ticket } from 'lucide-react'
 
 type DreamCardProps = {
   reve: Reve
   isFocused?: boolean
   onEdit: (reve: Reve) => void
   onDelete: (reve: Reve) => void
+  onConvert: (reve: Reve) => void
 }
 
-function DreamCard({ reve, isFocused, onEdit, onDelete }: DreamCardProps) {
+function DreamCard({ reve, isFocused, onEdit, onDelete, onConvert }: DreamCardProps) {
   const dateLabel = reve.priority === 'haute' ? 'Date estimée' : 'Date possible'
   const budgetLabel = reve.priority === 'haute' ? 'Budget rêvé' : 'Budget'
 
@@ -50,6 +52,9 @@ function DreamCard({ reve, isFocused, onEdit, onDelete }: DreamCardProps) {
           <span className="label-mono">{footLabel}</span>
         </div>
         <div className="actions">
+          <button title="Billets pris → créer le concert" onClick={() => onConvert(reve)}>
+            <Ticket size={15} />
+          </button>
           <button title="Modifier" onClick={() => onEdit(reve)}>✎</button>
           <button title="Supprimer" onClick={() => onDelete(reve)}>✕</button>
         </div>
