@@ -5,6 +5,7 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabaseClient'
 import LoginPage from './pages/LoginPage'
 import logo from './assets/logo-sans-fond.svg'
+import VersionBanner from './components/VersionBanner'
 
 const NAV_ITEMS = [
   { id: 'accueil', label: 'Accueil', to: '/', icon: Home },
@@ -84,6 +85,7 @@ function App() {
         </aside>
 
         <main className="main">
+          <VersionBanner />
           <Outlet />
         </main>
       </div>
