@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 import "../styles/parametres.css";
+import ImageCropper from "../components/ImageCropper";
 
 // L'URL publique finit par .../avatars/123456.jpg → on extrait "123456.jpg"
 function fileNameFromPublicUrl(url: string): string | null {
@@ -13,6 +14,7 @@ function ParametresPage() {
   const [avatarStyle, setAvatarStyle] = useState<"kpop" | "metal">("kpop");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [nameMessage, setNameMessage] = useState("");
   const [isSavingName, setIsSavingName] = useState(false);
 
@@ -46,10 +48,19 @@ function ParametresPage() {
     loadProfil();
   }, []);
 
-  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    // Étape 1 : choisir un fichier ouvre la modale de recadrage (pas d'upload ici)
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    setNameMessage("");
+    const localUrl = URL.createObjectURL(file);
+    setCropSrc(localUrl);
+    e.target.value = ""; // permet de re-choisir le même fichier ensuite
+  }
 
+  // Étape 2 : le recadrage validé nous donne l'image coupée (blob) → on l'uploade
+  async function handleCropped(blob: Blob) {
+    setCropSrc(null);
     setIsUploadingAvatar(true);
     setNameMessage("");
 
@@ -68,12 +79,10 @@ function ParametresPage() {
       }
     }
 
-    const fileExtension = file.name.split(".").pop();
-    const fileName = `${Date.now()}.${fileExtension}`;
-
+    const fileName = `${Date.now()}.jpg`; // le canvas produit du JPEG
     const { error: uploadError } = await supabase.storage
       .from("avatars")
-      .upload(fileName, file);
+      .upload(fileName, blob);
 
     if (uploadError) {
       setNameMessage("Upload impossible : " + uploadError.message);
@@ -281,8 +290,17 @@ function ParametresPage() {
               </button>
             </div>
           </form>
-        </section>
+                </section>
       </div>
+
+      {cropSrc && (
+        <ImageCropper
+          imageSrc={cropSrc}
+          aspect={1}
+          onCancel={() => setCropSrc(null)}
+          onCropped={handleCropped}
+        />
+      )}
     </>
   );
 }
