@@ -54,7 +54,7 @@
 }
 
 .cc-poster {
-  height: 168px;
+  aspect-ratio: 2 / 1;
   position: relative;
   overflow: hidden;
 }
