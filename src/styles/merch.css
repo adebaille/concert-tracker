@@ -115,7 +115,7 @@
   border-color: var(--hair-strong);
 }
 .mr-item .preview {
-  height: 120px;
+  aspect-ratio: 4 / 3;
   position: relative;
   display: grid;
   place-items: center;
