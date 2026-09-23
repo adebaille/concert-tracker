@@ -38,7 +38,7 @@ function MerchPage() {
   async function loadMerch() {
     const [{ data: merchRows }, { data: profilRows }, { data: groupeRows }, { data: userData }] =
       await Promise.all([
-        supabase.from('merch').select('*'),
+        supabase.from('merch').select('*').order('name'),
         supabase.from('profils').select('*'),
         supabase.from('groupes').select('id, name'),
         supabase.auth.getUser(),

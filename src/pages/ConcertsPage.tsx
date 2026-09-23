@@ -15,7 +15,7 @@ function ConcertsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingConcert, setEditingConcert] = useState<Concert | null>(null)
-  const [activeFilter, setActiveFilter] = useState<'tous' | 'a-venir' | 'passes'>('tous')
+  const [activeFilter, setActiveFilter] = useState<'tous' | 'a-venir' | 'passes'>('a-venir')
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'grille' | 'liste'>('grille')
 
@@ -25,7 +25,7 @@ function ConcertsPage() {
   async function loadConcerts() {
     const [{ data: concertRows }, { data: profilRows }, { data: lineupRows }, { data: groupeRows }] =
       await Promise.all([
-        supabase.from('concerts').select('*'),
+        supabase.from('concerts').select('*').order('event_date', { ascending: false }),
         supabase.from('profils').select('*'),
         supabase.from('concert_lineup').select('*'),
         supabase.from('groupes').select('id, name, photo_url'),
@@ -122,20 +122,31 @@ function ConcertsPage() {
     loadConcerts()
   }
 
-  const filteredConcerts = concerts.filter((concert) => {
-    const matchesStatusFilter =
-      activeFilter === 'tous' ||
-      (activeFilter === 'a-venir' && concert.status === 'prevu') ||
-      (activeFilter === 'passes' && concert.status === 'passe')
+    const filteredConcerts = concerts
+    .filter((concert) => {
+      const matchesStatusFilter =
+        activeFilter === 'tous' ||
+        (activeFilter === 'a-venir' && concert.status === 'prevu') ||
+        (activeFilter === 'passes' && concert.status === 'passe')
 
-    const query = searchQuery.toLowerCase()
-    const matchesSearch =
-      concert.name.toLowerCase().includes(query) ||
-      concert.venue.toLowerCase().includes(query) ||
-      concert.city.toLowerCase().includes(query)
+      const query = searchQuery.toLowerCase()
+      const matchesSearch =
+        concert.name.toLowerCase().includes(query) ||
+        concert.venue.toLowerCase().includes(query) ||
+        concert.city.toLowerCase().includes(query)
 
-    return matchesStatusFilter && matchesSearch
-  })
+      return matchesStatusFilter && matchesSearch
+    })
+    .sort((a, b) => {
+      // Les concerts a venir passent toujours avant les concerts passes
+      if (a.status !== b.status) {
+        return a.status === 'prevu' ? -1 : 1
+      }
+      // A venir : le plus proche en premier / Passe : le plus recent en premier
+      return a.status === 'passe'
+        ? b.eventDate.localeCompare(a.eventDate)
+        : a.eventDate.localeCompare(b.eventDate)
+    })
 
   if (isLoading) {
     return (
@@ -160,13 +171,7 @@ function ConcertsPage() {
       </div>
 
       <div className="filters">
-        <button
-          className={`filter-chip ${activeFilter === 'tous' ? 'active' : ''}`}
-          onClick={() => setActiveFilter('tous')}
-        >
-          Tous <span className="count">{concerts.length}</span>
-        </button>
-        <button
+      <button
           className={`filter-chip ${activeFilter === 'a-venir' ? 'active' : ''}`}
           onClick={() => setActiveFilter('a-venir')}
         >
@@ -177,6 +182,12 @@ function ConcertsPage() {
           onClick={() => setActiveFilter('passes')}
         >
           Passés <span className="count">{concerts.filter((c) => c.status === 'passe').length}</span>
+        </button>
+        <button
+          className={`filter-chip ${activeFilter === 'tous' ? 'active' : ''}`}
+          onClick={() => setActiveFilter('tous')}
+        >
+          Tous <span className="count">{concerts.length}</span>
         </button>
 
         <div className="filter-sep"></div>

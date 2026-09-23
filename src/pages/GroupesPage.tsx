@@ -25,7 +25,7 @@ function GroupesPage() {
       { data: lineupRows },
       { data: concertRows },
     ] = await Promise.all([
-      supabase.from('groupes').select('*'),
+      supabase.from('groupes').select('*').order('name'),
       supabase.from('profils').select('*'),
       supabase.from('groupe_membres').select('*'),
       supabase.from('concert_lineup').select('*'),
