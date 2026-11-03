@@ -260,6 +260,8 @@
 .stat-head {
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 10px;
   margin-bottom: 18px;
 }
 .stat-ico {
@@ -270,7 +272,7 @@
   place-items: center;
   border: 0.5px solid var(--hair-strong);
   background: rgba(255, 255, 255, 0.03);
-  font-size: 16px;
+  color: var(--bar);
 }
 .stat-num {
   font-family: var(--font-display);
@@ -280,6 +282,7 @@
   margin-bottom: 4px;
   display: flex;
   align-items: baseline;
+  justify-content: center;
   gap: 8px;
 }
 .stat-num .suffix {
