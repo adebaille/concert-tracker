@@ -8,6 +8,7 @@ import Countdown from "../components/Countdown";
 import type { Concert, Participant, Profil } from "../types";
 import { buildConcertICS, downloadICS } from "../lib/calendar";
 import { syncPastConcerts } from "../lib/concerts";
+import { Music, Ticket, CalendarClock, ShoppingBag } from "lucide-react";
 
 type ConcertRow = {
   id: number;
@@ -301,37 +302,34 @@ function HomePage() {
         </>
       )}
 
-      <section className="stats">
+            <section className="stats">
         <div className="stat s-1">
           <div className="stat-head">
-            <div className="stat-ico">🎸</div>
+            <div className="stat-ico"><Music size={20} /></div>
+            <div className="stat-label">Groupes suivis</div>
           </div>
           <div className="stat-num">{groupesCount}</div>
-          <div className="stat-label">Groupes suivis</div>
         </div>
         <div className="stat s-2">
           <div className="stat-head">
-            <div className="stat-ico">🎫</div>
+            <div className="stat-ico"><Ticket size={20} /></div>
+            <div className="stat-label">Concerts vécus</div>
           </div>
           <div className="stat-num">{pastConcertsCount}</div>
-          <div className="stat-label">Concerts vécus</div>
         </div>
         <div className="stat s-3">
           <div className="stat-head">
-            <div className="stat-ico">📍</div>
+            <div className="stat-ico"><CalendarClock size={20} /></div>
+            <div className="stat-label">À venir</div>
           </div>
           <div className="stat-num">{upcomingConcerts.length}</div>
-          <div className="stat-label">À venir</div>
         </div>
         <div className="stat s-4">
           <div className="stat-head">
-            <div className="stat-ico">👕</div>
+            <div className="stat-ico"><ShoppingBag size={20} /></div>
+            <div className="stat-label">Inventaire merch</div>
           </div>
-          <div className="stat-num">
-            {merchCount}
-            <span className="suffix">items</span>
-          </div>
-          <div className="stat-label">Inventaire merch</div>
+          <div className="stat-num">{merchCount}<span className="suffix">items</span></div>
         </div>
       </section>
 
